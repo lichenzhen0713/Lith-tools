@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="application-name" content="Lith Tools" />
+    <meta name="apple-mobile-web-app-title" content="Lith Tools" />
+    <meta
+      name="description"
+      content="Lith Tools 多功能在线工具箱：计算器、单位换算、文本处理、颜色工具、开发工具、图像处理等一站式在线工具，无需安装，打开即用。"
+    />
+    <meta property="og:title" content="Lith Tools · 多功能在线工具箱" />
+    <meta property="og:description" content="70 个浏览器端工具：计算、转换、文本、图像、开发与更多。全部本地处理，无需安装。" />
+    <meta property="og:type" content="website" />
+    <title>Lith Tools · 多功能在线工具箱</title>
+    <script>
+      // Avoid dark-mode flash: apply the saved/system theme before React hydrates.
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

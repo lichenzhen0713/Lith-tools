@@ -1,0 +1,25 @@
+{
+  "name": "Lith Tools · 多功能在线工具箱",
+  "short_name": "Lith Tools",
+  "description": "70 个浏览器端工具：计算、转换、文本、图像、开发与更多。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8fb",
+  "theme_color": "#4f46e5",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

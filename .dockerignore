@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-server
+data
+screenshots
+docs/screenshots
+.git
+.github
+.env
+.env.*
+!.env.example
+*.log
+coverage
+.verify-*

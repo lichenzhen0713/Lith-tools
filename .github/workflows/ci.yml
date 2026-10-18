@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Typecheck · Build · Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck (client + server)
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Prepare database
+        run: npm run db:reset
+
+      - name: API smoke tests
+        run: |
+          NODE_ENV=development COOKIE_SECURE=false node dist-server/server/index.js > server.log 2>&1 &
+          SERVER_PID=$!
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8787/api/health > /dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/smoke.mjs
+          STATUS=$?
+          kill $SERVER_PID || true
+          exit $STATUS
+
+      - name: Server logs on failure
+        if: failure()
+        run: cat server.log || true
