@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="public/logo.svg" width="76" alt="Lith Tools logo" />
+
 # Lith Tools
 
 **70 个浏览器端工具 · 博客 · 论坛 · 管理后台 —— 一站式在线工具箱**
@@ -11,9 +13,9 @@
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A522.5-339933?logo=node.js&logoColor=white)](package.json)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](package.json)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](tsconfig.json)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md)
 
-[功能](#功能) · [截图](#截图) · [快速开始](#快速开始) · [配置](#配置) · [架构](docs/ARCHITECTURE.md) · [API](docs/API.md) · [部署](docs/DEPLOYMENT.md) · [贡献](CONTRIBUTING.md)
+[功能](#功能) · [截图](#截图) · [快速开始](#快速开始) · [配置](#配置) · [架构](docs/ARCHITECTURE.md) · [API](docs/API.md) · [部署](docs/DEPLOYMENT.md) · [贡献](docs/CONTRIBUTING.md) · [更新日志](docs/CHANGELOG.md)
 
 </div>
 
@@ -268,7 +270,7 @@ Fastify
 - 网络工具限制端口并拒绝内网地址；IP/汇率查询由服务端缓存代理。
 - AI 密钥只存在服务端环境变量。
 
-安全模型、部署加固与漏洞报告方式见 [`SECURITY.md`](SECURITY.md)。
+安全模型、部署加固与漏洞报告方式见 [`SECURITY.md`](docs/SECURITY.md)。
 
 ## 与旧版的关系
 
@@ -294,9 +296,9 @@ Fastify
 
 欢迎提交 Issue 与 Pull Request。开始之前请阅读：
 
-- [`CONTRIBUTING.md`](CONTRIBUTING.md)：开发环境、代码风格、如何新增工具
-- [`TOOLS_GUIDE.md`](TOOLS_GUIDE.md)：工具实现约定
-- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)：社区行为准则
+- [`CONTRIBUTING.md`](docs/CONTRIBUTING.md)：开发环境、代码风格、如何新增工具
+- [`TOOLS_GUIDE.md`](docs/TOOLS_GUIDE.md)：工具实现约定
+- [`CODE_OF_CONDUCT.md`](docs/CODE_OF_CONDUCT.md)：社区行为准则
 
 ## 许可证
 

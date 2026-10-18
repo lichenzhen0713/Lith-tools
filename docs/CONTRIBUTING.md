@@ -6,8 +6,8 @@
 
 ## 参与方式
 
-- 报告 Bug：使用 [Bug 模板](.github/ISSUE_TEMPLATE/bug_report.yml)，附版本、浏览器、复现步骤与截图。
-- 提出功能建议：使用 [Feature 模板](.github/ISSUE_TEMPLATE/feature_request.yml)，说明使用场景。
+- 报告 Bug：使用 [Bug 模板](../.github/ISSUE_TEMPLATE/bug_report.yml)，附版本、浏览器、复现步骤与截图。
+- 提出功能建议：使用 [Feature 模板](../.github/ISSUE_TEMPLATE/feature_request.yml)，说明使用场景。
 - 提交代码：Fork → 分支 → 修改 → 测试 → Pull Request。
 - 改进文档：README、`docs/`、`TOOLS_GUIDE.md` 都欢迎修订。
 - **安全问题**：不要开公开 Issue，请按 [`SECURITY.md`](SECURITY.md) 私下报告。

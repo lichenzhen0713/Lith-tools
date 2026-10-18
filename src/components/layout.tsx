@@ -30,12 +30,12 @@ const navItems = [
 function Logo() {
   return (
     <Link to="/" className="flex items-center gap-2.5" aria-label="Lith Tools 首页">
-      <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-lg font-bold text-white shadow-sm shadow-indigo-500/30">
-        L
-      </span>
+      <img src="/logo.svg" alt="" width={34} height={32} className="h-8 w-auto" />
       <span className="flex flex-col leading-none">
-        <span className="text-[15px] font-semibold tracking-tight">Lith Tools</span>
-        <span className="mt-1 text-[10px] tracking-[0.14em] text-[var(--text-muted)] uppercase">Toolbox</span>
+        <span className="text-[16px] font-extrabold tracking-tight">Lith Tools</span>
+        <span className="mt-1 text-[10px] font-semibold tracking-[0.16em] text-[var(--text-muted)] uppercase">
+          Toolbox
+        </span>
       </span>
     </Link>
   );
@@ -138,14 +138,30 @@ function Header({ onOpenSearch }: { onOpenSearch: () => void }) {
   const { theme, toggle } = useTheme();
   const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 6);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 border-b backdrop-blur-xl" style={{ background: 'var(--header-bg)' }}>
+    <header
+      className={cn(
+        'sticky top-0 z-40 border-b backdrop-blur-xl backdrop-saturate-150 transition-shadow',
+        scrolled || mobileOpen
+          ? 'border-[var(--card-border)] shadow-[0_10px_34px_-28px_rgba(13,25,45,0.55)]'
+          : 'border-transparent',
+      )}
+      style={{ background: 'var(--header-bg)' }}
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Logo />
         <nav className="ml-4 hidden items-center gap-1 md:flex">
@@ -171,7 +187,7 @@ function Header({ onOpenSearch }: { onOpenSearch: () => void }) {
           <button
             type="button"
             onClick={onOpenSearch}
-            className="hidden items-center gap-2 rounded-xl border px-3 py-2 text-sm text-[var(--text-muted)] transition-colors hover:bg-[var(--hover-bg)] sm:flex"
+            className="hidden items-center gap-2 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-2 text-sm text-[var(--text-muted)] shadow-[0_1px_2px_rgba(13,25,45,0.03)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:flex"
           >
             <Search className="size-4" />
             <span>搜索工具</span>
@@ -258,13 +274,20 @@ function Header({ onOpenSearch }: { onOpenSearch: () => void }) {
 
 function Footer() {
   return (
-    <footer className="mt-20 border-t bg-[var(--card-bg)]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="mt-20 border-t" style={{ background: 'var(--bg-2)' }}>
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
         <div>
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed subtle">
             一站式在线工具箱：计算、转换、文本、图像与开发者工具，全部在浏览器本地完成处理。
           </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="version-pill">v2.0.0</span>
+            <span className="version-pill">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              本地处理 · 无需上传
+            </span>
+          </div>
         </div>
         <FooterColumn
           title="工具"
@@ -297,7 +320,10 @@ function Footer() {
       <div className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs subtle sm:flex-row sm:px-6">
           <p>© {new Date().getFullYear()} Lith Tools · 多功能在线工具箱</p>
-          <p>Node.js · React · TypeScript · SQLite</p>
+          <p className="flex items-center gap-2">
+            <span className="size-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400" />
+            Node.js · React · TypeScript · SQLite
+          </p>
         </div>
       </div>
     </footer>
@@ -307,11 +333,11 @@ function Footer() {
 function FooterColumn({ title, links }: { title: string; links: { to: string; label: string }[] }) {
   return (
     <div>
-      <p className="text-xs font-semibold tracking-[0.12em] text-[var(--text-primary)] uppercase">{title}</p>
-      <ul className="mt-3 space-y-2 text-sm">
+      <p className="text-[11px] font-bold tracking-[0.14em] text-[var(--text-muted)] uppercase">{title}</p>
+      <ul className="mt-3.5 space-y-2.5 text-sm">
         {links.map((link) => (
           <li key={`${link.to}-${link.label}`}>
-            <Link to={link.to} className="subtle transition-colors hover:text-[var(--text-primary)]">
+            <Link to={link.to} className="text-[var(--text-secondary)] transition-colors hover:text-[var(--brand)]">
               {link.label}
             </Link>
           </li>

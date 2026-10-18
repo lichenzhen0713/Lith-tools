@@ -150,7 +150,7 @@ shared/catalog.ts  ──seed──▶  tools 表 ──GET /api/tools──▶ 
 | SSRF | 网络工具仅允许公网地址与 80/443/8080/8443 |
 | 密钥泄露 | 全部走环境变量；前端不接触 AI/SMTP 密钥 |
 
-细节与部署加固见 [`SECURITY.md`](../SECURITY.md)。
+细节与部署加固见 [`SECURITY.md`](SECURITY.md)。
 
 ## 10. 性能与扩展性
 

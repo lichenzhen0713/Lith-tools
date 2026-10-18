@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         感谢反馈！请尽量提供可复现的信息。
-        安全问题请勿在此公开，请按仓库 `SECURITY.md` 中的说明私下报告。
+        安全问题请勿在此公开，请按仓库 `docs/SECURITY.md` 中的说明私下报告。
 
   - type: textarea
     id: description

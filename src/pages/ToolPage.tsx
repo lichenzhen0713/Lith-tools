@@ -70,57 +70,59 @@ export default function ToolPage() {
         <span className="text-[var(--text-secondary)]">{tool.name}</span>
       </nav>
 
-      <header className="mt-5 flex flex-wrap items-start justify-between gap-4">
-        <div className="flex min-w-0 items-start gap-4">
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-600 ring-1 ring-indigo-100 dark:from-indigo-500/15 dark:to-violet-500/10 dark:text-indigo-300 dark:ring-indigo-500/20">
-            <Icon className="size-7" />
-          </span>
-          <div className="min-w-0">
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{tool.name}</h1>
-            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed muted">{tool.description}</p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {category ? <Badge tone="brand">{category.name}</Badge> : null}
-              {toolMap.get(slug)?.server ? (
-                <Badge tone="warning">
-                  <Server className="size-3" /> 经由服务器查询
-                </Badge>
-              ) : (
-                <Badge tone="success">
-                  <ShieldCheck className="size-3" /> 浏览器本地处理
-                </Badge>
-              )}
-              <Badge>无需注册</Badge>
+      <header className="tool-hero mt-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-4">
+            <span className={`icon-tile icon-tile-lg tint-${tool.category?.slug ?? 'others'}`}>
+              <Icon className="size-7" />
+            </span>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{tool.name}</h1>
+              <p className="mt-1.5 max-w-2xl text-sm leading-relaxed muted">{tool.description}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {category ? <Badge tone="brand">{category.name}</Badge> : null}
+                {toolMap.get(slug)?.server ? (
+                  <Badge tone="warning">
+                    <Server className="size-3" /> 经由服务器查询
+                  </Badge>
+                ) : (
+                  <Badge tone="success">
+                    <ShieldCheck className="size-3" /> 浏览器本地处理
+                  </Badge>
+                )}
+                <Badge>无需注册</Badge>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={bookmarked ? Check : Bookmark}
-            onClick={() => {
-              setBookmarks((previous) => (previous.includes(slug) ? previous.filter((item) => item !== slug) : [...previous, slug]));
-              toast.success(bookmarked ? '已取消收藏' : '已加入收藏');
-            }}
-          >
-            {bookmarked ? '已收藏' : '收藏'}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={Share2}
-            onClick={async () => {
-              const ok = await copyText(window.location.href);
-              if (ok) toast.success('工具链接已复制');
-              else toast.error('复制失败');
-            }}
-          >
-            分享
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={bookmarked ? Check : Bookmark}
+              onClick={() => {
+                setBookmarks((previous) => (previous.includes(slug) ? previous.filter((item) => item !== slug) : [...previous, slug]));
+                toast.success(bookmarked ? '已取消收藏' : '已加入收藏');
+              }}
+            >
+              {bookmarked ? '已收藏' : '收藏'}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={Share2}
+              onClick={async () => {
+                const ok = await copyText(window.location.href);
+                if (ok) toast.success('工具链接已复制');
+                else toast.error('复制失败');
+              }}
+            >
+              分享
+            </Button>
+          </div>
         </div>
       </header>
 
-      <div className="mt-7">
+      <div className="mt-6">
         {tool.isExternal ? (
           <div className="card flex flex-col items-center gap-3 p-10 text-center">
             <p className="text-sm muted">该工具由社区推荐，将在新窗口打开。</p>
@@ -149,13 +151,19 @@ export default function ToolPage() {
 
       {related.length > 0 ? (
         <section className="mt-14">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold">同类工具</h2>
-            <Link to={category ? `/tools?category=${category.slug}` : '/tools'} className="text-sm text-indigo-600 hover:underline dark:text-indigo-400">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="eyebrow">继续探索</p>
+              <h2 className="mt-2 text-xl font-bold tracking-tight">同类工具</h2>
+            </div>
+            <Link
+              to={category ? `/tools?category=${category.slug}` : '/tools'}
+              className="text-sm font-semibold text-[var(--brand)] hover:underline"
+            >
               查看全部
             </Link>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((item) => (
               <ToolCard key={item.id} tool={item} compact />
             ))}
@@ -167,7 +175,7 @@ export default function ToolPage() {
         <Link to="/tools" className={cn('flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)]')}>
           <ArrowLeft className="size-4" /> 返回工具库
         </Link>
-        <Link to="/feedback" className="text-indigo-600 hover:underline dark:text-indigo-400">
+        <Link to="/feedback" className="font-medium text-[var(--brand)] hover:underline">
           这个工具不好用？告诉我们
         </Link>
       </div>

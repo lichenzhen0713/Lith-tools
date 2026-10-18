@@ -509,9 +509,9 @@ export function PageHeader({
   return (
     <div className={cn('flex flex-wrap items-end justify-between gap-4', className)}>
       <div>
-        {eyebrow ? <p className="mb-2 text-xs font-semibold tracking-[0.12em] text-indigo-600 uppercase dark:text-indigo-400">{eyebrow}</p> : null}
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
-        {description ? <p className="mt-2 max-w-2xl text-sm leading-relaxed muted">{description}</p> : null}
+        {eyebrow ? <p className="eyebrow mb-3">{eyebrow}</p> : null}
+        <h1 className="text-2xl font-extrabold tracking-[-0.03em] sm:text-[2rem]">{title}</h1>
+        {description ? <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-muted)]">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </div>

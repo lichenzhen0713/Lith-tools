@@ -35,7 +35,7 @@ npm run tools:check  # 如涉及工具
 
 ## 检查清单
 
-- [ ] 已阅读 `CONTRIBUTING.md` 与 `TOOLS_GUIDE.md`
+- [ ] 已阅读 `docs/CONTRIBUTING.md` 与 `docs/TOOLS_GUIDE.md`
 - [ ] 类型检查与构建通过
 - [ ] 新增/修改的接口已写入 `docs/API.md`
 - [ ] 新增工具已写入 `shared/catalog.ts` 并运行 `npm run docs:map`

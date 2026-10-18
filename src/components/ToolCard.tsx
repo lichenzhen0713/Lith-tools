@@ -6,24 +6,29 @@ import { cn } from '../lib/utils';
 
 export function ToolCard({ tool, className, compact = false }: { tool: ToolDTO; className?: string; compact?: boolean }) {
   const Icon = toolIcon(tool.icon);
+  const tint = `tint-${tool.category?.slug ?? 'others'}`;
+
   const content = (
     <>
       <div className="flex items-start justify-between gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-600 ring-1 ring-indigo-100 transition-transform group-hover:scale-105 dark:from-indigo-500/15 dark:to-violet-500/10 dark:text-indigo-300 dark:ring-indigo-500/20">
+        <span className={cn('icon-tile transition-transform duration-200 group-hover:scale-105', tint)}>
           <Icon className="size-5" />
         </span>
         {tool.isExternal ? (
-          <ArrowUpRight className="size-4 text-slate-300 transition-colors group-hover:text-indigo-500" />
+          <ArrowUpRight className="size-4 text-[var(--text-muted)] transition-colors group-hover:text-[var(--brand)]" />
         ) : (
-          <ChevronRight className="size-4 -translate-x-1 text-slate-300 opacity-0 transition-all group-hover:translate-x-0 group-hover:text-indigo-500 group-hover:opacity-100" />
+          <ChevronRight className="size-4 -translate-x-1 text-[var(--text-muted)] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:text-[var(--brand)] group-hover:opacity-100" />
         )}
       </div>
       <div className="mt-3">
-        <p className="font-medium tracking-tight">{tool.name}</p>
-        {!compact ? <p className="mt-1 line-clamp-2 text-xs leading-relaxed subtle">{tool.description}</p> : null}
+        <p className="font-semibold tracking-tight">{tool.name}</p>
+        {!compact ? (
+          <p className="mt-1 line-clamp-2 text-[12.5px] leading-relaxed text-[var(--text-muted)]">{tool.description}</p>
+        ) : null}
       </div>
       {!compact && tool.category ? (
-        <p className="mt-3 text-[11px] font-medium tracking-wide text-indigo-600/70 uppercase dark:text-indigo-400/70">
+        <p className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-[var(--brand)]">
+          <span className="size-1 rounded-full bg-current" />
           {tool.category.name}
         </p>
       ) : null}
@@ -31,7 +36,7 @@ export function ToolCard({ tool, className, compact = false }: { tool: ToolDTO; 
   );
 
   const classes = cn(
-    'group card block p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:hover:border-indigo-500/30',
+    'group card block p-4 transition-all duration-200 hover:-translate-y-1 hover:border-[var(--border-strong)] hover:shadow-[0_18px_40px_-28px_rgba(13,25,45,0.45)]',
     className,
   );
 

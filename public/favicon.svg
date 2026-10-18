@@ -1,11 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Lith Tools">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#6366f1"/>
-      <stop offset="1" stop-color="#4338ca"/>
+    <linearGradient id="ltIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="55%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="16" fill="url(#g)"/>
-  <path d="M22 16v26h20v-7H30V16z" fill="#fff"/>
-  <circle cx="44" cy="42" r="4" fill="#c7d2fe"/>
+  <rect width="64" height="64" rx="15" fill="url(#ltIcon)"/>
+  <path d="M22 16 V43 H42" fill="none" stroke="#FFFFFF" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="45" cy="45" r="4" fill="#A5F3FC"/>
 </svg>

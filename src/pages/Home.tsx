@@ -4,11 +4,10 @@ import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
+  Layers,
   MessageSquare,
   Search,
-  Send,
   Sparkles,
-  TrendingUp,
   Wrench,
 } from 'lucide-react';
 import { toolCatalog } from '@shared/catalog';
@@ -22,6 +21,7 @@ import { ToolCard } from '../components/ToolCard';
 import { toolIcon } from '../icons';
 
 const featuredSlugs = toolCatalog.filter((tool) => tool.featured).map((tool) => tool.slug);
+const popularSlugs = ['json-formatter', 'image-compress', 'qr-code', 'world-clock', 'gpa-calculator'];
 
 export default function Home() {
   const navigate = useNavigate();
@@ -33,7 +33,10 @@ export default function Home() {
 
   const featured = useMemo(() => {
     const bySlug = new Map(tools.map((tool) => [tool.slug, tool]));
-    return featuredSlugs.map((slug) => bySlug.get(slug)).filter((tool): tool is NonNullable<typeof tool> => Boolean(tool)).slice(0, 8);
+    return featuredSlugs
+      .map((slug) => bySlug.get(slug))
+      .filter((tool): tool is NonNullable<typeof tool> => Boolean(tool))
+      .slice(0, 8);
   }, [tools]);
 
   const grouped = useMemo(() => {
@@ -47,121 +50,165 @@ export default function Home() {
     return map;
   }, [tools]);
 
+  const popular = useMemo(
+    () =>
+      popularSlugs
+        .map((slug) => tools.find((tool) => tool.slug === slug))
+        .filter((tool): tool is NonNullable<typeof tool> => Boolean(tool)),
+    [tools],
+  );
+
   const submitSearch = (event: React.FormEvent) => {
     event.preventDefault();
     navigate(query.trim() ? `/tools?q=${encodeURIComponent(query.trim())}` : '/tools');
   };
 
+  const statItems = [
+    { label: '在线工具', value: stats.data?.tools ?? 70 },
+    { label: '工具分类', value: stats.data?.categories ?? 13 },
+    { label: '社区文章', value: stats.data?.blogs ?? 0 },
+    { label: '论坛主题', value: stats.data?.threads ?? 0 },
+  ];
+
   return (
     <>
       {/* ------------------------------------------------------------- hero */}
-      <section className="relative overflow-hidden border-b">
+      <section className="relative overflow-hidden">
         <div className="hero-glow absolute inset-0" aria-hidden="true" />
         <div className="grid-pattern absolute inset-0" aria-hidden="true" />
-        <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-14 text-center sm:px-6 sm:pt-24 sm:pb-20">
-          <Badge tone="brand" className="mx-auto">
-            <Sparkles className="size-3.5" />
-            {stats.data ? `${formatNumber(stats.data.tools)} 个在线工具 · 全部本地处理` : '多功能在线工具箱'}
-          </Badge>
-          <h1 className="mx-auto mt-6 max-w-3xl text-3xl leading-[1.18] font-semibold tracking-tight text-balance sm:text-5xl lg:text-[3.4rem]">
+        <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-14 text-center sm:px-6 sm:pt-24 sm:pb-16">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-3.5 py-1.5 text-xs text-[var(--text-secondary)] shadow-[var(--shadow-soft)]">
+            <span className="size-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-[0_0_0_4px_rgba(99,102,241,0.14)]" />
+            v2.0
+            <span className="text-[var(--border-strong)]">·</span>
+            70 个工具
+            <span className="text-[var(--border-strong)]">·</span>
+            MIT License
+            <span className="text-[var(--border-strong)]">·</span>
+            本地处理
+          </span>
+
+          <h1 className="hero-title">
             把常用工具，
-            <span className="inline-block bg-gradient-to-r from-indigo-600 via-violet-600 to-sky-500 bg-clip-text text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-sky-300">
-              放在同一个地方
-            </span>
+            <br />
+            <span className="grad">放进一个工具箱</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-balance muted sm:text-lg">
-            计算器、单位换算、文本与图像处理、开发者工具……无需安装、无需上传，打开即用。
+          <p className="lede">
+            计算、转换、文本、图像与开发者工具。无需安装，打开即用；图片与文件只在你的浏览器里处理，从不上传服务器。
           </p>
 
-          <form onSubmit={submitSearch} className="mx-auto mt-8 max-w-xl">
-            <div className="flex items-center gap-2 rounded-2xl border bg-[var(--card-bg)] p-2 shadow-lg shadow-indigo-500/5 transition-shadow focus-within:shadow-indigo-500/15">
-              <Search className="ml-2 size-5 shrink-0 text-slate-400" />
+          <div className="hero-search">
+            <div className="hero-search-bar">
+              <span className="dot-row" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="font-semibold text-[var(--text-secondary)]">工具搜索</span>
+              <span className="ml-auto hidden text-[11.5px] sm:inline">70 个工具 · 全部本地处理</span>
+            </div>
+            <form onSubmit={submitSearch} className="hero-search-body">
+              <Search className="size-5 shrink-0 text-[var(--text-muted)]" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="搜索工具，例如 JSON 格式化、二维码、BMI…"
-                className="h-10 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400 sm:text-base"
+                placeholder="搜索工具，例如 JSON、二维码…"
                 aria-label="搜索工具"
               />
               <button type="submit" className="btn-primary shrink-0">
                 <span className="hidden sm:inline">搜索</span>
                 <ArrowRight className="size-4 sm:hidden" />
               </button>
-            </div>
-          </form>
-
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
-            <span className="subtle">热门：</span>
-            {['json-formatter', 'image-compress', 'qr-code', 'world-clock', 'gpa-calculator'].map((slug) => {
-              const tool = tools.find((item) => item.slug === slug);
-              if (!tool) return null;
-              return (
-                <Link key={slug} to={`/tools/${slug}`} className="chip">
+            </form>
+            <div className="hero-search-foot">
+              <span className="mr-1">热门</span>
+              {popular.map((tool) => (
+                <Link key={tool.id} to={`/tools/${tool.slug}`} className="chip">
                   {tool.name}
                 </Link>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {[
-              { label: '在线工具', value: stats.data?.tools ?? 70 },
-              { label: '工具分类', value: stats.data?.categories ?? 13 },
-              { label: '社区文章', value: stats.data?.blogs ?? 0 },
-              { label: '论坛主题', value: stats.data?.threads ?? 0 },
-            ].map((item) => (
-              <div key={item.label} className="rounded-xl border bg-[var(--card-bg)]/80 px-3 py-3 backdrop-blur">
-                <p className="text-xl font-semibold tracking-tight">{formatNumber(item.value)}</p>
-                <p className="mt-0.5 text-xs subtle">{item.label}</p>
-              </div>
-            ))}
+          <div className="cta-row">
+            <Link to="/tools" className="btn-primary">
+              浏览全部工具 <ArrowRight className="size-4" />
+            </Link>
+            <a href="#categories" className="btn-secondary">
+              <Layers className="size-4" /> 按分类浏览
+            </a>
+            <Link to="/blog" className="btn-ghost">
+              <BookOpen className="size-4" /> 阅读博客
+            </Link>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl space-y-16 px-4 py-14 sm:px-6">
-        {/* --------------------------------------------------------- featured */}
-        <section>
-          <SectionHeader
-            icon={TrendingUp}
-            title="热门工具"
-            description="大家最常打开的高频工具，覆盖计算、开发与图像处理。"
-            to="/tools"
-          />
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ------------------------------------------------------------- stats */}
+      <section className="stats-band" aria-label="站点数据">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 text-center sm:grid-cols-4 sm:px-6">
+          {statItems.map((item) => (
+            <div key={item.label}>
+              <span className="stat-number">{formatNumber(item.value)}</span>
+              <span className="mt-1 block text-xs text-[var(--text-muted)]">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------- featured */}
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <section className="section-block" id="featured">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="section-head mb-0">
+              <p className="eyebrow">热门推荐</p>
+              <h2 className="section-title">最常用的工具，一步直达</h2>
+              <p className="section-sub">覆盖计算、开发、图像与文本处理，打开即用。</p>
+            </div>
+            <Link to="/tools" className="flex items-center gap-1 text-sm font-semibold text-[var(--brand)] hover:underline">
+              全部工具 <ArrowRight className="size-3.5" />
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {loading
-              ? Array.from({ length: 8 }).map((_, index) => <Skeleton key={index} className="h-36" />)
+              ? Array.from({ length: 8 }).map((_, index) => <Skeleton key={index} className="h-40" />)
               : featured.map((tool) => <ToolCard key={tool.id} tool={tool} />)}
           </div>
         </section>
+      </div>
 
-        {/* ------------------------------------------------------- categories */}
-        <section>
-          <SectionHeader
-            icon={Wrench}
-            title="按分类浏览"
-            description="13 个分类覆盖日常与专业场景，找到你需要的工具。"
-            to="/tools"
-            linkLabel="全部工具"
-          />
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {/* -------------------------------------------------------- categories */}
+      <section className="section-alt" id="categories">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="section-head">
+            <p className="eyebrow">分类浏览</p>
+            <h2 className="section-title">13 个分类，覆盖日常与专业场景</h2>
+            <p className="section-sub">从标准计算器到图像处理，从 JSON 到二维码，按分类快速找到需要的工具。</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((category) => {
               const Icon = toolIcon(category.icon);
               const list = (grouped.get(category.slug) ?? []).slice(0, 3);
               return (
-                <Card key={category.id} className="group p-5 transition-colors hover:border-indigo-200 dark:hover:border-indigo-500/30">
+                <Card
+                  key={category.id}
+                  className="group p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--border-strong)] hover:shadow-md"
+                >
                   <div className="flex items-start gap-3">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                    <span className={`icon-tile tint-${category.slug}`}>
                       <Icon className="size-5" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <Link to={`/tools?category=${category.slug}`} className="font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
+                        <Link
+                          to={`/tools?category=${category.slug}`}
+                          className="font-semibold tracking-tight transition-colors hover:text-[var(--brand)]"
+                        >
                           {category.name}
                         </Link>
-                        <span className="text-xs subtle">{category.toolCount ?? 0} 个</span>
+                        <span className="text-xs text-[var(--text-muted)]">{category.toolCount ?? 0} 个</span>
                       </div>
-                      <p className="mt-1 text-xs leading-relaxed subtle">{category.description}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">{category.description}</p>
                     </div>
                   </div>
                   <ul className="mt-4 space-y-1.5 border-t pt-3">
@@ -169,7 +216,7 @@ export default function Home() {
                       <li key={tool.id}>
                         <Link
                           to={`/tools/${tool.slug}`}
-                          className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)]"
+                          className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-[13px] text-[var(--text-secondary)] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)]"
                         >
                           <span className="truncate">{tool.name}</span>
                           <ArrowUpRight className="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
@@ -180,38 +227,70 @@ export default function Home() {
                 </Card>
               );
             })}
+            <Link
+              to="/tools"
+              className="group flex flex-col justify-center gap-3 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--card-bg)]/60 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand)] hover:bg-[var(--card-bg)]"
+            >
+              <span className="icon-tile tint-others">
+                <Layers className="size-5" />
+              </span>
+              <div>
+                <p className="font-semibold tracking-tight">全部 70 个工具</p>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">按关键词搜索、按分类筛选，找到你要的那一个。</p>
+              </div>
+              <span className="flex items-center gap-1 text-xs font-semibold text-[var(--brand)]">
+                进入工具库 <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ------------------------------------------------------ blog + forum */}
-        <section className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+      {/* ------------------------------------------------------- blog + forum */}
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <section className="section-block grid gap-10 lg:grid-cols-[1.35fr_1fr]">
           <div>
-            <SectionHeader icon={BookOpen} title="最新博客" description="来自社区的技术分享与使用技巧。" to="/blog" />
-            <div className="mt-5 space-y-3">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="eyebrow">社区</p>
+                <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">最新文章</h2>
+              </div>
+              <Link to="/blog" className="text-sm font-semibold text-[var(--brand)] hover:underline">
+                全部文章
+              </Link>
+            </div>
+            <div className="mt-6 space-y-3">
               {blogs.loading ? (
-                Array.from({ length: 3 }).map((_, index) => <Skeleton key={index} className="h-28" />)
+                Array.from({ length: 3 }).map((_, index) => <Skeleton key={index} className="h-32" />)
               ) : (blogs.data?.items.length ?? 0) === 0 ? (
                 <Card className="p-6 text-sm subtle">还没有公开文章，来写第一篇吧。</Card>
               ) : (
                 blogs.data?.items.map((blog) => (
-                  <Link key={blog.id} to={`/blog/${blog.id}`} className="card group block p-5 transition-colors hover:border-indigo-200 dark:hover:border-indigo-500/30">
-                    <div className="flex items-center gap-2 text-xs subtle">
+                  <Link
+                    key={blog.id}
+                    to={`/blog/${blog.id}`}
+                    className="card group block p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--border-strong)] hover:shadow-md"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
                       <span>{blog.author.username}</span>
-                      {blog.category ? <span>· {blog.category.name}</span> : null}
+                      {blog.category ? (
+                        <Badge tone="brand" className="px-2 py-0.5">
+                          {blog.category.name}
+                        </Badge>
+                      ) : null}
                       <span>· {relativeTime(blog.createdAt)}</span>
-                      <span className="ml-auto flex items-center gap-3">
-                        <span>{formatNumber(blog.views)} 阅读</span>
-                        <span>{blog.likes} 赞</span>
+                      <span className="ml-auto">
+                        {formatNumber(blog.views)} 阅读 · {blog.likes} 赞
                       </span>
                     </div>
-                    <h3 className="mt-2 font-medium tracking-tight transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    <h3 className="mt-2.5 font-semibold tracking-tight transition-colors group-hover:text-[var(--brand)]">
                       {blog.title}
                     </h3>
-                    <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed muted">{blog.summary}</p>
+                    <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-[var(--text-muted)]">{blog.summary}</p>
                   </Link>
                 ))
               )}
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-1">
                 <Link to="/blog" className="btn-secondary btn-sm">
                   浏览全部文章 <ArrowRight className="size-3.5" />
                 </Link>
@@ -223,88 +302,76 @@ export default function Home() {
           </div>
 
           <div>
-            <SectionHeader icon={MessageSquare} title="论坛动态" description="提问、讨论与建议。" to="/forum" linkLabel="进入论坛" />
-            <Card className="mt-5 divide-y">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <p className="eyebrow">讨论</p>
+                <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">论坛动态</h2>
+              </div>
+              <Link to="/forum" className="text-sm font-semibold text-[var(--brand)] hover:underline">
+                进入论坛
+              </Link>
+            </div>
+            <Card className="mt-6 divide-y overflow-hidden">
               {threads.loading ? (
                 <div className="space-y-3 p-4">
                   {Array.from({ length: 4 }).map((_, index) => (
-                    <Skeleton key={index} className="h-10" />
+                    <Skeleton key={index} className="h-12" />
                   ))}
                 </div>
               ) : (threads.data?.items.length ?? 0) === 0 ? (
                 <p className="p-5 text-sm subtle">论坛还很安静，欢迎发起第一个话题。</p>
               ) : (
                 threads.data?.items.map((thread) => (
-                  <Link key={thread.id} to={`/forum/thread/${thread.id}`} className="block px-4 py-3 transition-colors hover:bg-[var(--hover-bg)]">
+                  <Link
+                    key={thread.id}
+                    to={`/forum/thread/${thread.id}`}
+                    className="block px-4 py-3.5 transition-colors hover:bg-[var(--hover-bg)]"
+                  >
                     <p className="line-clamp-1 text-sm font-medium">{thread.title}</p>
-                    <p className="mt-1 flex items-center gap-2 text-xs subtle">
+                    <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
                       <span>{thread.forumName}</span>
                       <span>· {thread.author.username}</span>
-                      <span className="ml-auto">{thread.replyCount} 回复 · {relativeTime(thread.lastReplyAt ?? thread.createdAt)}</span>
+                      <span className="ml-auto">
+                        {thread.replyCount} 回复 · {relativeTime(thread.lastReplyAt ?? thread.createdAt)}
+                      </span>
                     </p>
                   </Link>
                 ))
               )}
+              <div className="flex items-center gap-2 px-4 py-3">
+                <MessageSquare className="size-4 text-[var(--brand)]" />
+                <span className="text-xs text-[var(--text-muted)]">登录后即可发起主题与回复</span>
+                <Link to="/forum" className="ml-auto text-xs font-semibold text-[var(--brand)] hover:underline">
+                  去看看
+                </Link>
+              </div>
             </Card>
           </div>
         </section>
 
-        {/* ---------------------------------------------------------------- CTA */}
-        <section className="overflow-hidden rounded-3xl border bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white sm:p-10">
-          <div className="flex flex-wrap items-center justify-between gap-6">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight">有好用的工具或文章？</h2>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-indigo-100">
-                推荐一个工具、投稿一篇教程，或者告诉我们哪里可以做得更好。每一条反馈都会被认真查看。
+        {/* --------------------------------------------------------------- CTA */}
+        <section className="pb-16">
+          <div className="cta-card">
+            <div className="max-w-2xl min-w-0 flex-1">
+              <p className="flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-white/80 uppercase">
+                <Sparkles className="size-4" /> 免费 · 开源 · 可自托管
+              </p>
+              <h2 className="mt-3 text-2xl font-bold tracking-tight text-balance sm:text-3xl">把常用工具，放进你的浏览器</h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/85">
+                无需安装、无需上传。收藏工具、发布文章、参与讨论，都是可选的；核心工具永远开箱即用。
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Link to="/submit/tool" className="btn bg-white text-indigo-700 hover:bg-indigo-50">
-                <Send className="size-4" /> 推荐工具
+              <Link to="/tools" className="btn bg-white text-indigo-700 shadow-lg hover:bg-indigo-50">
+                开始使用 <ArrowRight className="size-4" />
               </Link>
-              <Link to="/submit/blog" className="btn border border-white/30 bg-white/10 text-white hover:bg-white/20">
-                <BookOpen className="size-4" /> 投稿文章
-              </Link>
-              <Link to="/feedback" className="btn border border-white/30 bg-white/10 text-white hover:bg-white/20">
-                <MessageSquare className="size-4" /> 意见反馈
+              <Link to="/about" className="btn border border-white/35 bg-white/10 text-white hover:bg-white/20">
+                <Wrench className="size-4" /> 了解项目
               </Link>
             </div>
           </div>
         </section>
       </div>
     </>
-  );
-}
-
-function SectionHeader({
-  icon: Icon,
-  title,
-  description,
-  to,
-  linkLabel = '查看全部',
-}: {
-  icon: typeof Wrench;
-  title: string;
-  description?: string;
-  to?: string;
-  linkLabel?: string;
-}) {
-  return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
-            <Icon className="size-4" />
-          </span>
-          {title}
-        </h2>
-        {description ? <p className="mt-1.5 text-sm subtle">{description}</p> : null}
-      </div>
-      {to ? (
-        <Link to={to} className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
-          {linkLabel} <ArrowRight className="size-3.5" />
-        </Link>
-      ) : null}
-    </div>
   );
 }
