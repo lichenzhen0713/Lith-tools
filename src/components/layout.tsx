@@ -33,10 +33,10 @@ const navItems = [
 
 function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-2.5" aria-label="Lith Tools 首页">
-      <img src="/logo.svg" alt="" width={34} height={32} className="h-8 w-auto" />
+    <Link to="/" className="flex items-center gap-3" aria-label="Lith Tools 首页">
+      <img src="/logo.svg?v=3" alt="" width={44} height={41} className="h-10 w-auto sm:h-11" />
       <span className="flex flex-col leading-none">
-        <span className="text-[16px] font-extrabold tracking-tight">Lith Tools</span>
+        <span className="text-[17px] font-extrabold tracking-tight">Lith Tools</span>
         <span className="mt-1 text-[10px] font-semibold tracking-[0.16em] text-[var(--text-muted)] uppercase">
           Toolbox
         </span>

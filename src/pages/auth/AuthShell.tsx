@@ -22,7 +22,7 @@ export function AuthShell({
           <div>
             <Link to="/" className="flex items-center gap-2.5">
               <span className="grid size-10 place-items-center rounded-xl bg-white p-1.5 shadow-sm">
-                <img src="/logo.svg" alt="" className="h-full w-auto" />
+                <img src="/logo.svg?v=3" alt="" className="h-full w-auto" />
               </span>
               <span className="text-[15px] font-bold tracking-tight">Lith Tools</span>
             </Link>
