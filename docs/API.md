@@ -93,7 +93,7 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
 | GET | `/api/health` | 公开 | 健康检查 |
 | GET | `/api/site` | 公开 | 站点名称、版本、SMTP/AI 是否配置 |
 | GET | `/api/stats/public` | 公开 | 工具/分类/博客/主题/回复/用户数 |
-| GET | `/api/tools` | 公开 | 分类与工具（管理员可见禁用项） |
+| GET | `/api/tools` | 公开 | 分类与工具（超级管理员可见禁用项） |
 | GET | `/api/tools/:slug` | 公开 | 单个工具元数据 |
 
 `GET /api/tools` 响应：
@@ -117,7 +117,7 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
 | GET | `/api/blog/posts` | 公开 | 列表；`page`、`pageSize`（默认 9）、`categoryId`、`q`、`authorId`、`mine=1`、`sort=latest\|views` |
 | GET | `/api/blog/recent?limit=3` | 公开 | 最新公开文章 |
 | GET | `/api/blog/categories` | 公开 | 分类与文章数 |
-| GET | `/api/blog/posts/:id` | 公开/作者/管理员 | 详情并递增阅读量；含评论第 1 页与点赞状态 |
+| GET | `/api/blog/posts/:id` | 公开 / 作者 / 超级管理员 | 详情并递增阅读量；含评论第 1 页与点赞状态 |
 | POST | `/api/blog/posts` | 登录 | `{ title, content, categoryId?, isPublic? }` |
 | PATCH | `/api/blog/posts/:id` | 作者 / 超级管理员 | 同上字段；更新 `latest_at` |
 | DELETE | `/api/blog/posts/:id` | 作者 / 管理员 | 级联删除评论与点赞 |
@@ -131,7 +131,7 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
 | PATCH | `/api/blog/submissions/:id` | 作者（待审核） | 修改标题/内容 |
 | DELETE | `/api/blog/submissions/:id` | 作者 / 管理员 | 删除投稿 |
 
-私有文章（`isPublic=false`）仅作者、管理员可见；不可见时返回 404，避免泄露存在性。
+私有文章（`isPublic=false`）仅作者、超级管理员可见；不可见时返回 404，避免泄露存在性。
 
 ## 论坛
 
