@@ -114,4 +114,4 @@
 - `script.js`（搜索/暗色模式/首页跳转）→ React 组件与 `ThemeProvider`、`SearchPalette`。
 - `font-awesome-4.7.0/`、`all.min.css` → `lucide-react` 图标。
 - `PHPMailer/`、`src/` → `nodemailer`（可选邮件服务）。
-- `chat.php` 中暴露的 API Key 已删除，改由服务端环境变量 `OPENROUTER_API_KEY` 提供。
+- `chat.php` 中暴露的 API Key 已删除，改由服务端环境变量 `DEEPSEEK_API_KEY` 提供。

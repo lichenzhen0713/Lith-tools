@@ -17,7 +17,9 @@
 - **管理后台**：数据概览、用户管理（角色/封禁/删除）、工具管理、博客与分类管理、反馈处理、投稿审核、IP 封禁与历史、访问记录。
 - **反馈与工具推荐**：评分反馈、审核流转、可选邮件通知。
 - **网络工具服务端代理**：IP 归属地、DNS、TCP 连通性、实时汇率（含缓存与内网/端口限制）。
-- **AI 助手**：服务端代理 OpenRouter，密钥不下发浏览器，登录 + 限流。
+- **AI 助手**：接入 DeepSeek，支持通用对话、深度思考、代码、翻译与写作五种模式；服务端代理，密钥不下发浏览器，登录 + 限流。
+- **交互式首页 Hero**：左侧文案 + 右侧 Quick Lab（计算、取色、单位换算、密码生成）实时可用，强调本地处理。
+- **性能与体积**：应用入口拆分为 44 KB 应用 + 255 KB React vendor；移除 jsPDF（PDF 改用浏览器打印）；KaTeX 按需加载；裁剪旧字体；全站 Brotli/gzip 与 immutable 缓存。
 - **工程化**：TypeScript strict、zod 校验、SQLite 迁移与种子、Dockerfile、GitHub Actions、Issue/PR 模板、Dependabot。
 
 ### 变更
@@ -48,7 +50,7 @@
 - 非 GET 请求校验 `Origin` 与 Host。
 - 登录/注册/验证码/找回密码/发帖/评论/投稿/AI 分组限流。
 - Markdown 经 `DOMPurify` 消毒；SQL 全参数化。
-- SMTP 与 OpenRouter 密钥仅存服务端环境变量。
+- SMTP 与 DeepSeek 密钥仅存服务端环境变量。
 - 移除旧仓库中泄露的数据库口令、SMTP 授权码与 AI API Key。
 
 ### 移除
@@ -56,6 +58,7 @@
 - 旧版 PHP 页面、PHPMailer 副本、Font Awesome 与多个 CDN 依赖。
 - 硬编码的“小皮面板”外部后台链接与服务器地址。
 - 伪造的 MP3/MP4 等格式转换功能。
+- `jspdf`（PDF 改为浏览器原生打印）与未使用的 `cropperjs` 依赖。
 - `blog_posts` 死代码、失效的聊天室页面与重复工具页。
 
 ### 文档

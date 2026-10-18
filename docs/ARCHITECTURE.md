@@ -39,7 +39,7 @@
 
 - SMTP：验证码、重置链接、审核/封禁通知。
 - `ipinfo.io`、`open.er-api.com`：IP 归属地与实时汇率（服务端缓存代理）。
-- OpenRouter（或兼容接口）：AI 助手。
+- DeepSeek（OpenAI 兼容接口）：AI 助手，服务端代理、5 种模式。
 
 ## 3. 请求生命周期
 
@@ -152,11 +152,15 @@ shared/catalog.ts  ──seed──▶  tools 表 ──GET /api/tools──▶ 
 
 细节与部署加固见 [`SECURITY.md`](SECURITY.md)。
 
-## 10. 性能与扩展性
+## 10. 性能与体积
 
-- **首屏**：React/路由/首页 chunk 约 330 KB（gzip 107 KB），其余页面与工具按需加载。
-- **数据库**：WAL 模式、索引、预编译语句；访问统计与封禁归档为轻量写操作。
-- **缓存**：IP 归属地 10 分钟、DNS 60 秒、汇率 1 小时（进程内）。
+- **首屏**：应用外壳 + 首页 + 图标/目录约 462 KB 原始 / **114 KB Brotli**（含 React vendor 与 CSS）。
+- **入口拆分**：应用代码 44 KB + React vendor 255 KB；vendor 可长期缓存，工具/页面独立 chunk。
+- **懒加载**：KaTeX、html2canvas、JSZip、二维码、各工具均在需要时才下载。
+- **PDF**：不使用 PDF 库，统一走 `printHtmlDocument()` + 浏览器原生「另存为 PDF」。
+- **字体**：构建时裁掉 KaTeX 的 ttf/woff 旧格式，仅保留 woff2（−0.78 MB）。
+- **传输**：`@fastify/compress` 提供 Brotli/gzip；带哈希资源 `immutable` 缓存一年，`index.html` `no-cache`。
+- **数据库**：WAL、索引、预编译语句；IP 归属地 10 分钟、DNS 60 秒、汇率 1 小时进程内缓存。
 - **限额**：单进程内存限流，适合个人/小团队部署；多实例需替换为 Redis 等共享存储（见 §11）。
 
 ## 11. 权衡与已知限制

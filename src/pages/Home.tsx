@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
+  Check,
   Layers,
   MessageSquare,
   Search,
@@ -18,6 +19,7 @@ import { useApi } from '../lib/hooks';
 import { formatNumber, relativeTime } from '../lib/utils';
 import { Badge, Card, Skeleton } from '../components/ui';
 import { ToolCard } from '../components/ToolCard';
+import { QuickLab } from '../components/hero/QuickLab';
 import { toolIcon } from '../icons';
 
 const featuredSlugs = toolCatalog.filter((tool) => tool.featured).map((tool) => tool.slug);
@@ -76,70 +78,86 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="hero-glow absolute inset-0" aria-hidden="true" />
         <div className="grid-pattern absolute inset-0" aria-hidden="true" />
-        <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-14 text-center sm:px-6 sm:pt-24 sm:pb-16">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-3.5 py-1.5 text-xs text-[var(--text-secondary)] shadow-[var(--shadow-soft)]">
-            <span className="size-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-[0_0_0_4px_rgba(99,102,241,0.14)]" />
-            v2.0
-            <span className="text-[var(--border-strong)]">·</span>
-            70 个工具
-            <span className="text-[var(--border-strong)]">·</span>
-            MIT License
-            <span className="text-[var(--border-strong)]">·</span>
-            本地处理
-          </span>
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pt-14 pb-16 sm:px-6 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12 lg:pt-20 lg:pb-24">
+          <div className="text-center lg:text-left">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-3.5 py-1.5 text-xs text-[var(--text-secondary)] shadow-[var(--shadow-soft)]">
+              <span className="size-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-[0_0_0_4px_rgba(99,102,241,0.14)]" />
+              v2.0
+              <span className="text-[var(--border-strong)]">·</span>
+              70 个工具
+              <span className="text-[var(--border-strong)]">·</span>
+              MIT License
+              <span className="text-[var(--border-strong)]">·</span>
+              本地处理
+            </span>
 
-          <h1 className="hero-title">
-            把常用工具，
-            <br />
-            <span className="grad">放进一个工具箱</span>
-          </h1>
-          <p className="lede">
-            计算、转换、文本、图像与开发者工具。无需安装，打开即用；图片与文件只在你的浏览器里处理，从不上传服务器。
-          </p>
+            <h1 className="mt-6 text-[clamp(2.45rem,5vw,4.15rem)] leading-[1.05] font-extrabold tracking-[-0.045em] text-balance">
+              把 70 个工具，
+              <br />
+              <span className="grad">装进一个标签页。</span>
+            </h1>
+            <p className="mx-auto mt-5 max-w-xl text-[15.5px] leading-[1.85] text-[var(--text-secondary)] sm:text-base lg:mx-0">
+              计算、转换、文本、图像与开发者工具。无需安装、无需上传，打开浏览器就能用。
+            </p>
 
-          <div className="hero-search">
-            <div className="hero-search-bar">
-              <span className="dot-row" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-              <span className="font-semibold text-[var(--text-secondary)]">工具搜索</span>
-              <span className="ml-auto hidden text-[11.5px] sm:inline">70 个工具 · 全部本地处理</span>
-            </div>
-            <form onSubmit={submitSearch} className="hero-search-body">
-              <Search className="size-5 shrink-0 text-[var(--text-muted)]" />
+            <form
+              onSubmit={submitSearch}
+              className="mx-auto mt-7 flex max-w-xl items-center gap-2 rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-2 shadow-[var(--shadow-soft)] transition-colors focus-within:border-[var(--border-strong)] lg:mx-0"
+            >
+              <Search className="ml-2 size-5 shrink-0 text-[var(--text-muted)]" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="搜索工具，例如 JSON、二维码…"
                 aria-label="搜索工具"
+                className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--text-muted)]"
               />
               <button type="submit" className="btn-primary shrink-0">
-                <span className="hidden sm:inline">搜索</span>
-                <ArrowRight className="size-4 sm:hidden" />
+                搜索
+                <ArrowRight className="size-4" />
               </button>
             </form>
-            <div className="hero-search-foot">
-              <span className="mr-1">热门</span>
+
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs lg:justify-start">
+              <span className="text-[var(--text-muted)]">热门</span>
               {popular.map((tool) => (
                 <Link key={tool.id} to={`/tools/${tool.slug}`} className="chip">
                   {tool.name}
                 </Link>
               ))}
             </div>
+
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+              <Link to="/tools" className="btn-primary">
+                浏览全部工具 <ArrowRight className="size-4" />
+              </Link>
+              <a href="#categories" className="btn-secondary">
+                <Layers className="size-4" /> 按分类浏览
+              </a>
+              <Link to="/blog" className="btn-ghost">
+                <BookOpen className="size-4" /> 阅读博客
+              </Link>
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11.5px] text-[var(--text-muted)] lg:justify-start">
+              <span className="flex items-center gap-1">
+                <Check className="size-3.5 text-emerald-500" /> 无需安装
+              </span>
+              <span className="flex items-center gap-1">
+                <Check className="size-3.5 text-emerald-500" /> 文件不上传
+              </span>
+              <span className="flex items-center gap-1">
+                <Check className="size-3.5 text-emerald-500" /> MIT 开源
+              </span>
+            </div>
           </div>
 
-          <div className="cta-row">
-            <Link to="/tools" className="btn-primary">
-              浏览全部工具 <ArrowRight className="size-4" />
-            </Link>
-            <a href="#categories" className="btn-secondary">
-              <Layers className="size-4" /> 按分类浏览
-            </a>
-            <Link to="/blog" className="btn-ghost">
-              <BookOpen className="size-4" /> 阅读博客
-            </Link>
+          <div className="relative mx-auto w-full max-w-[440px] lg:max-w-none">
+            <div
+              className="pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-gradient-to-br from-indigo-500/20 via-violet-500/10 to-cyan-400/20 blur-2xl"
+              aria-hidden="true"
+            />
+            <QuickLab />
           </div>
         </div>
       </section>

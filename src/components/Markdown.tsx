@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
-import katex from 'katex';
-import 'katex/dist/katex.min.css';
 import { cn } from '../lib/utils';
 
 marked.setOptions({ gfm: true, breaks: true });
@@ -25,6 +23,13 @@ interface MathSegment {
   display: boolean;
 }
 
+interface KatexLike {
+  renderToString(expression: string, options?: Record<string, unknown>): string;
+}
+
+const MATH_PATTERN = /\$\$[\s\S]+?\$\$|\$[^$\n]+?\$/;
+const BLOCK_MATH = /^\s*\$\$([\s\S]+?)\$\$\s*$/;
+
 function splitMath(text: string): MathSegment[] {
   const segments: MathSegment[] = [];
   const pattern = /\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g;
@@ -40,7 +45,25 @@ function splitMath(text: string): MathSegment[] {
   return segments;
 }
 
-function renderMath(root: HTMLElement): void {
+function renderMath(root: HTMLElement, katex: KatexLike): void {
+  // Block math often arrives as "$$<br>…<br>$$" because marked breaks newlines.
+  for (const block of Array.from(root.querySelectorAll<HTMLElement>('p, li, div'))) {
+    if (block.closest('pre') || block.closest('code')) continue;
+    const children = Array.from(block.children);
+    if (children.some((child) => child.tagName !== 'BR')) continue;
+    const match = (block.textContent ?? '').match(BLOCK_MATH);
+    if (!match) continue;
+    try {
+      block.innerHTML = katex.renderToString(match[1].trim(), {
+        displayMode: true,
+        throwOnError: false,
+        strict: false,
+      });
+    } catch {
+      /* leave the original text in place */
+    }
+  }
+
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const nodes: Text[] = [];
   while (walker.nextNode()) nodes.push(walker.currentNode as Text);
@@ -85,9 +108,19 @@ export function Markdown({ content, className, empty = '暂无内容' }: { conte
 
   useEffect(() => {
     const element = containerRef.current;
-    if (!element) return;
-    if (html) renderMath(element);
-  }, [html]);
+    if (!element || !html) return;
+    // KaTeX (JS + CSS + fonts) is only fetched when the content really has math.
+    if (!MATH_PATTERN.test(content)) return;
+    let cancelled = false;
+    Promise.all([import('katex'), import('katex/dist/katex.min.css')])
+      .then(([module]) => {
+        if (!cancelled) renderMath(element, module.default as unknown as KatexLike);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [html, content]);
 
   if (!content?.trim()) return <p className="text-sm subtle">{empty}</p>;
 

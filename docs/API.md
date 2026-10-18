@@ -210,14 +210,39 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
 
 限制：拒绝内网/保留地址；DNS 与 IP 查询使用进程内缓存；上游超时返回 502/504。
 
-## AI 助手
+## AI 助手（DeepSeek）
 
 | 方法 | 路径 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| GET | `/api/assistant/status` | 公开 | 是否配置及模型名 |
-| POST | `/api/assistant/chat` | 登录 | `{ messages: [{ role: "user"\|"assistant", content }] }`（≤20 条） |
+| GET | `/api/assistant/status` | 公开 | 是否配置、服务商、默认模式与 5 种模式列表 |
+| POST | `/api/assistant/chat` | 登录 | `{ mode?, messages: [{ role: "user"\|"assistant", content }] }`（≤20 条） |
 
-未配置 `OPENROUTER_API_KEY` 时返回 503。密钥只存在服务端。
+模式：
+
+| `mode` | 名称 | 模型 | 说明 |
+| --- | --- | --- | --- |
+| `chat` | 通用对话 | `deepseek-chat` | 日常问答、工具用法 |
+| `reasoning` | 深度思考 | `deepseek-reasoner` | 返回 `reasoning` 字段（推理过程），前端可折叠展示 |
+| `code` | 代码助手 | `deepseek-chat` | 代码生成、审查与解释 |
+| `translate` | 翻译润色 | `deepseek-chat` | 中英互译与语气调整 |
+| `writing` | 写作助手 | `deepseek-chat` | 提纲、文案、文章修改 |
+
+响应：
+
+```json
+{
+  "reply": "…",
+  "reasoning": "…或 null",
+  "model": "deepseek-chat",
+  "mode": "chat",
+  "modeName": "通用对话",
+  "tokens": 76
+}
+```
+
+- 未配置 `DEEPSEEK_API_KEY` 时返回 503。
+- Key 无效返回 502，余额不足返回 502，频率限制返回 429，超时返回 504。
+- 密钥只存在服务端；请勿在日志或前端暴露。
 
 ## 示例：创建博客并评论
 

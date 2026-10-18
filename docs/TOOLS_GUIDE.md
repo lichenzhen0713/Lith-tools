@@ -82,10 +82,10 @@ import { toolIcon } from '../icons';
 
 - `jszip`（ZIP 打包/解压）
 - `qrcode`（二维码：`import QRCode from 'qrcode'`，`QRCode.toDataURL(text, { width, margin, color })`）
-- `katex`（公式渲染：`import katex from 'katex'` + `import 'katex/dist/katex.min.css'`）
+- `katex`（公式渲染；Markdown 组件已按需动态加载，工具内使用静态导入会进入该工具 chunk）
 - `marked` + `dompurify`（Markdown，已封装在 `components/Markdown.tsx`，优先直接用）
-- `html2canvas` + `jspdf`（导出图片/PDF）
-- `cropperjs`（图片裁剪，需 `import 'cropperjs/dist/cropper.css'`）
+- `html2canvas`（导出 PNG；仅在需要的工具里动态 `import()`）
+- PDF/打印：使用 `src/lib/print.ts` 的 `printHtmlDocument()` 调用浏览器原生打印，不要引入 PDF 库
 - `lucide-react`
 
 **禁止**：CDN `<script>`、新增 npm 依赖、请求第三方接口（除非使用下面的本站代理接口）。

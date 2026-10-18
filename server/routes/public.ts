@@ -112,7 +112,7 @@ export async function publicRoutes(app: FastifyInstance): Promise<void> {
       name: config.appName,
       version: '2.0.0',
       smtpConfigured: Boolean(config.smtp.host && config.smtp.user),
-      assistantConfigured: Boolean(process.env.OPENROUTER_API_KEY),
+      assistantConfigured: Boolean(config.deepseek.apiKey),
       registrationOpen: true,
     };
   });

@@ -38,6 +38,8 @@ NODE_ENV=production node dist-server/server/index.js
 | `DB_PATH` | `/var/lib/lith-tools/lith-tools.db` | 建议放在持久化目录 |
 | `ADMIN_PASSWORD` | 强密码 | 仅首次创建超级管理员时使用 |
 | `SMTP_*` | 你的邮件服务 | 不配置则注册/找回密码无法收到验证码 |
+| `DEEPSEEK_API_KEY` | 你的 DeepSeek Key | 启用 AI 助手；仅服务端使用 |
+| `DEEPSEEK_BASE_URL` | `https://api.deepseek.com/v1` | OpenAI 兼容接口地址 |
 | `COOKIE_SECURE` | 保持默认 | 本地 HTTP 验证生产构建时临时设为 `false` |
 
 ## systemd 示例
@@ -169,7 +171,7 @@ docker compose up -d --build
 | 写操作返回 403「请求来源校验失败」 | 反向代理未透传 `Host`，或 `PUBLIC_ORIGIN` 与访问域名不一致 |
 | 返回 429 | 触发限流，等待窗口结束；限流为进程内实现，重启会清零 |
 | IP 查询/汇率失败 | 服务器无法访问外部网络，或上游限流；工具页面会提示稍后重试 |
-| AI 助手 503 | 未配置 `OPENROUTER_API_KEY` |
+| AI 助手 503 | 未配置 `DEEPSEEK_API_KEY`，或修改 `.env` 后未重启 |
 | 页面 404 / 空白 | 未执行 `npm run build`，或反向代理没有把请求交给 Node 进程 |
 
 ## 安全清单

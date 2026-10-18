@@ -68,7 +68,7 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 ### 可选集成
 
 - **邮件**：配置 SMTP 后发送验证码、重置链接与审核通知。
-- **AI 助手**：配置 `OPENROUTER_API_KEY` 后启用，密钥只保存在服务端。
+- **AI 助手**：接入 DeepSeek，支持通用对话、深度思考（展示推理过程）、代码、翻译与写作五种模式；密钥只保存在服务端。
 
 ## 截图
 
@@ -80,13 +80,13 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 | --- | --- |
 | ![博客详情](docs/screenshots/blog-detail.png) | ![个人中心](docs/screenshots/dashboard.png) |
 
-| 管理后台 | 深色模式 |
+| 管理后台 | AI 助手 |
 | --- | --- |
-| ![管理后台](docs/screenshots/admin-overview.png) | ![深色模式](docs/screenshots/home-dark.png) |
+| ![管理后台](docs/screenshots/admin-overview.png) | ![AI 助手](docs/screenshots/assistant.png) |
 
-| 论坛 | 移动端 |
+| 深色模式 | 移动端 |
 | --- | --- |
-| ![论坛](docs/screenshots/forum-list.png) | ![移动端](docs/screenshots/home-mobile.png) |
+| ![深色模式](docs/screenshots/home-dark.png) | ![移动端](docs/screenshots/home-mobile.png) |
 
 ## 技术栈
 
@@ -100,6 +100,8 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 | 校验 | zod 4 | 所有写接口显式校验 |
 | 密码 | `scrypt`（Node crypto） | 随机盐 + `timingSafeEqual` |
 | 测试 | Playwright（本机 Chrome）+ Node 脚本 | API 冒烟、70 工具渲染、UI 流程与截图 |
+| 传输 | Brotli / gzip + immutable 缓存 | `@fastify/compress`，静态资源按哈希长缓存 |
+| AI | DeepSeek（OpenAI 兼容） | 5 种模式，服务端代理，密钥不下发 |
 
 ## 快速开始
 
@@ -164,7 +166,8 @@ docker compose up -d --build
 | `COOKIE_SECURE` | 生产默认 `true` | 会话 Cookie 的 `Secure` 标记；本地 HTTP 测试设为 `false` |
 | `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` | `admin` / `admin@example.com` / `admin123456` | 首次启动创建超级管理员 |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | 空 / `465` / `true` | 邮件服务 |
-| `OPENROUTER_API_KEY` / `OPENROUTER_MODEL` | 空 / `openai/gpt-4o-mini` | AI 助手（仅服务端） |
+| `DEEPSEEK_API_KEY` / `DEEPSEEK_BASE_URL` | 空 / `https://api.deepseek.com/v1` | AI 助手密钥与接口地址（仅服务端） |
+| `DEEPSEEK_CHAT_MODEL` / `DEEPSEEK_REASONING_MODEL` | `deepseek-chat` / `deepseek-reasoner` | 对话与深度思考模型 |
 | `SEED_DEMO` | `true` | 空库时写入欢迎博客/论坛内容 |
 
 ## 脚本
@@ -181,6 +184,8 @@ docker compose up -d --build
 | `npm run smoke` | 端到端 API 冒烟测试（需运行中的服务） |
 | `npm run tools:check` | 用本机 Chrome 遍历 70 个工具页并截图 |
 | `npm run ui:check` | 浏览器 UI 冒烟测试（首页/搜索/暗色/博客/论坛/登录/后台/移动端） |
+| `npm run verify:extras` | 校验 AI 五种模式、KaTeX 渲染与字体加载 |
+| `npm run snapshot` | 生成完整页面截图（视觉回归用） |
 | `npm run docs:map` | 重新生成 `docs/URL-MAP.md` |
 
 ## 测试与质量
@@ -194,9 +199,20 @@ docker compose up -d --build
 | `npm run smoke` | 注册/登录/博客/评论/点赞/论坛/反馈/投稿/权限/管理后台全部通过 |
 | `npm run tools:check` | **70/70** 工具页渲染无错误 |
 | `npm run ui:check` | 首页、搜索面板、暗色模式、工具库、工具页、博客、论坛、登录、个人中心、管理后台、移动端全部通过 |
+| `npm run verify:extras` | AI 5 种模式、DeepSeek 对话/推理、KaTeX 与字体加载全部通过 |
 | 生产静态服务 | `/`、`/assets/*`、`/tools/<slug>` SPA 回退、`/api/*` 均正确响应 |
 
 浏览器检查依赖本机安装的 Chrome，截图写入 `screenshots/`（已 gitignore）。
+
+### 性能与体积
+
+- 首屏（应用外壳 + 首页 + 图标/目录 chunk）约 **462 KB 原始 / 114 KB Brotli**（含 React vendor 与 CSS）。
+- 应用入口 JS 从 **326 KB 拆分**为 44 KB 应用代码 + 255 KB 可长期缓存的 React vendor。
+- 移除 `jsPDF`（运行时 chunk −376 KB、安装体积 −28.7 MB），PDF 导出改用浏览器原生打印。
+- KaTeX 从 Markdown 默认依赖中移出，仅在有公式时按需加载；构建时裁剪 ttf/woff 旧字体（**−0.78 MB**）。
+- `html2canvas`、`JSZip`、二维码等仅在对应工具中懒加载。
+- 全站 Brotli/gzip 压缩；带哈希的静态资源使用一年 `immutable` 缓存，`index.html` 保持 `no-cache`。
+- `dist/` 总体积从 3.5 MB 降至 **2.31 MB**（仍包含全部工具与 woff2 字体）。
 
 ## 目录结构
 
@@ -258,7 +274,7 @@ Fastify
 | 论坛 | `GET /api/forum/forums`、`POST /api/forum/forums/:id/threads`、`POST /threads/:id/posts` |
 | 管理 | `/api/admin/users`、`/admin/tools`、`/admin/submissions`、`/admin/bans` |
 | 网络 | `GET /api/net/ip`、`/net/dns`、`/net/rates`；`POST /net/ping` |
-| AI | `POST /api/assistant/chat`（登录 + 限流） |
+| AI | `GET /api/assistant/status`；`POST /api/assistant/chat`（5 种模式，登录 + 限流） |
 
 ## 安全
 

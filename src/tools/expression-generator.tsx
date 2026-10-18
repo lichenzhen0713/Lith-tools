@@ -3,6 +3,7 @@ import { Calculator, FileDown, RefreshCw } from 'lucide-react';
 import { Actions, Field, Hint, Input, Panel, ToolSplit } from './kit';
 import { Alert, Button, EmptyState, Switch, Tabs } from '../components/ui';
 import { cn } from '../lib/utils';
+import { printHtmlDocument } from '../lib/print';
 import { useToast } from '../lib/toast';
 
 type OperationType = 'addsub' | 'muldiv' | 'mixed';
@@ -465,18 +466,19 @@ export default function ExpressionGeneratorTool() {
     setExporting(true);
     setError(null);
     try {
-      const { jsPDF } = await import('jspdf');
       const pages = renderWorksheet(problems, snapshot, withAnswerPage);
       if (!pages.length) throw new Error('无法创建导出画布，请更换浏览器后重试。');
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      pages.forEach((page, index) => {
-        if (index > 0) pdf.addPage();
-        pdf.addImage(page.toDataURL('image/png'), 'PNG', 0, 0, 210, 297);
-      });
-      pdf.save('math-worksheet.pdf');
-      toast.success('练习卷 PDF 已生成');
+      const images = pages
+        .map((page, index) => `<div class="print-page"><img src="${page.toDataURL('image/png')}" alt="练习卷第 ${index + 1} 页" /></div>`)
+        .join('');
+      printHtmlDocument(
+        '四则运算练习卷',
+        images,
+        '.print-page img { width: 100%; display: block; } @page { size: A4 portrait; margin: 0; }',
+      );
+      toast.success('已打开打印窗口，可在对话框中选择「另存为 PDF」');
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : '导出 PDF 失败，请重试。');
+      setError(cause instanceof Error ? cause.message : '导出练习卷失败，请重试。');
     } finally {
       setExporting(false);
     }
@@ -622,14 +624,14 @@ export default function ExpressionGeneratorTool() {
           description={snapshot ? describeConfig(snapshot) : '生成后在这里查看题目。'}
           footer={
             <div className="flex flex-wrap items-center gap-3">
-              <Switch checked={withAnswerPage} onChange={setWithAnswerPage} label="PDF 附答案页" />
+              <Switch checked={withAnswerPage} onChange={setWithAnswerPage} label="附答案页" />
               <Button
                 icon={FileDown}
                 loading={exporting}
                 disabled={!answeredCount || exporting}
                 onClick={() => void exportPdf()}
               >
-                导出 PDF 练习卷
+                打印 / 导出 PDF
               </Button>
             </div>
           }
@@ -667,7 +669,7 @@ export default function ExpressionGeneratorTool() {
                 ))}
               </div>
               <Hint>
-                导出的 PDF 使用浏览器本地绘制后写入 jsPDF：A4 纵向、每页 {PER_PAGE} 道题，可选是否附加答案页。
+                练习卷使用浏览器原生打印：A4 纵向、每页 {PER_PAGE} 道题，可选是否附加答案页；在打印对话框中选择「另存为 PDF」即可保存。
               </Hint>
             </div>
           )}

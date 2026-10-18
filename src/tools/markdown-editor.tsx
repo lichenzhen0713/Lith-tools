@@ -28,6 +28,7 @@ import { Hint, Panel } from './kit';
 import { Button, Modal } from '../components/ui';
 import { useLocalStorage } from '../lib/hooks';
 import { download } from '../lib/utils';
+import { printHtmlDocument } from '../lib/print';
 import { useToast } from '../lib/toast';
 
 const STORAGE_KEY = 'lith:markdown-draft:v1';
@@ -58,7 +59,7 @@ export function greet(name: string): string {
 | 功能 | 状态 | 说明 |
 | --- | --- | --- |
 | 实时预览 | 已完成 | 分栏同步滚动 |
-| 导出 | 已完成 | .md / .html / PDF |
+| 导出 | 已完成 | .md / .html / 打印 PDF |
 | 本地保存 | 已完成 | localStorage |
 
 ---
@@ -326,94 +327,32 @@ export default function MarkdownEditorTool() {
     toast.success('HTML 文件已导出');
   }
 
-  async function exportPdf() {
+  function exportPdf() {
     if (!content.trim()) {
       toast.error('没有可导出的内容');
       return;
     }
     if (exporting) return;
     setExporting(true);
-    const title = documentTitle(content);
-    const node = document.createElement('div');
-    node.className = 'prose-content lith-pdf-export';
-    node.style.cssText =
-      'position:fixed;left:-20000px;top:0;width:794px;padding:48px;background:#ffffff;box-sizing:border-box;';
-    node.innerHTML = renderSafeHtml(content);
-    const style = document.createElement('style');
-    style.textContent = `
-      .lith-pdf-export, .lith-pdf-export * {
-        color: #111827 !important;
-        border-color: #d1d5db !important;
-        background-color: transparent !important;
-        box-shadow: none !important;
-        text-decoration-color: #111827 !important;
-      }
-      .lith-pdf-export { background-color: #ffffff !important; font-size: 14px; line-height: 1.75; }
-      .lith-pdf-export h1, .lith-pdf-export h2, .lith-pdf-export h3 { color: #0f172a !important; }
-      .lith-pdf-export pre, .lith-pdf-export code, .lith-pdf-export th { background-color: #f3f4f6 !important; }
-      .lith-pdf-export a { color: #4338ca !important; text-decoration: underline; }
-      .lith-pdf-export blockquote { color: #374151 !important; }
-      .lith-pdf-export img { max-width: 100%; height: auto; }
-      .lith-pdf-export table { border-collapse: collapse; width: 100%; }
-      .lith-pdf-export th, .lith-pdf-export td { border: 1px solid #d1d5db !important; padding: 6px 10px; }
-    `;
-    document.head.appendChild(style);
-    document.body.appendChild(node);
-
     try {
-      if (node.scrollHeight > 12000) {
-        throw new Error('文档过长（超过约 12000px），请分段导出 PDF');
-      }
-      const [canvasModule, pdfModule] = await Promise.all([import('html2canvas'), import('jspdf')]);
-      const html2canvas = canvasModule.default;
-      const { jsPDF } = pdfModule;
-      const canvas = await html2canvas(node, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        useCORS: true,
-        logging: false,
-      });
-      if (!canvas.width || !canvas.height) throw new Error('页面渲染失败，请稍后重试');
-
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 12;
-      const contentWidth = pageWidth - margin * 2;
-      const pixelsPerMm = canvas.width / contentWidth;
-      const pageContentHeight = (pageHeight - margin * 2) * pixelsPerMm;
-
-      let offset = 0;
-      let pageIndex = 0;
-      while (offset < canvas.height) {
-        const sliceHeight = Math.min(pageContentHeight, canvas.height - offset);
-        const slice = document.createElement('canvas');
-        slice.width = canvas.width;
-        slice.height = Math.max(1, Math.ceil(sliceHeight));
-        const context = slice.getContext('2d');
-        if (!context) throw new Error('无法创建画布上下文');
-        context.fillStyle = '#ffffff';
-        context.fillRect(0, 0, slice.width, slice.height);
-        context.drawImage(canvas, 0, offset, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
-        if (pageIndex > 0) pdf.addPage();
-        pdf.addImage(
-          slice.toDataURL('image/jpeg', 0.92),
-          'JPEG',
-          margin,
-          margin,
-          contentWidth,
-          sliceHeight / pixelsPerMm,
-        );
-        offset += sliceHeight;
-        pageIndex += 1;
-      }
-      pdf.save(`${safeFileName(title)}.pdf`);
-      toast.success('PDF 已生成');
+      const title = documentTitle(content);
+      printHtmlDocument(
+        title,
+        `<div class="print-doc">${renderSafeHtml(content)}</div>`,
+        `
+          .print-doc h1 { font-size: 22px; margin: 0 0 12px; }
+          .print-doc h2 { font-size: 18px; margin: 20px 0 8px; }
+          .print-doc h3 { font-size: 15px; margin: 16px 0 6px; }
+          .print-doc p { margin: 8px 0; }
+          .print-doc ul, .print-doc ol { padding-left: 20px; }
+          .print-doc pre code { background: transparent; padding: 0; }
+          .print-doc code { background: #f3f4f6; padding: 1px 4px; border-radius: 3px; }
+        `,
+      );
+      toast.success('已打开打印窗口，可在对话框中选择「另存为 PDF」');
     } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : '导出 PDF 失败，请重试');
+      toast.error(cause instanceof Error ? cause.message : '打开打印窗口失败，请重试');
     } finally {
-      node.remove();
-      style.remove();
       setExporting(false);
     }
   }
@@ -475,7 +414,7 @@ export default function MarkdownEditorTool() {
                 导出 HTML
               </Button>
               <Button variant="primary" size="sm" icon={FileText} loading={exporting} onClick={exportPdf}>
-                导出 PDF
+                打印 / PDF
               </Button>
             </div>
           </div>
@@ -551,7 +490,7 @@ export default function MarkdownEditorTool() {
 
         <div className="mt-4">
           <Hint>
-            导出 PDF 使用 html2canvas + jsPDF 在本地渲染，长文档会按页切分；跨域图片可能无法绘制。所有内容只保存在浏览器中。
+            导出 PDF 使用浏览器原生打印（A4 自动分页），在打印对话框中选择「另存为 PDF」即可；跨域图片可能无法打印。所有内容只保存在浏览器中。
           </Hint>
         </div>
       </Panel>

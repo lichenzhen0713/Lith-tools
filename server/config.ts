@@ -53,6 +53,12 @@ export const config = {
     email: process.env.ADMIN_EMAIL ?? 'admin@example.com',
     password: process.env.ADMIN_PASSWORD ?? 'admin123456',
   },
+  deepseek: {
+    apiKey: process.env.DEEPSEEK_API_KEY ?? '',
+    baseUrl: (process.env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/v1').replace(/\/$/, ''),
+    chatModel: process.env.DEEPSEEK_CHAT_MODEL ?? 'deepseek-chat',
+    reasoningModel: process.env.DEEPSEEK_REASONING_MODEL ?? 'deepseek-reasoner',
+  },
   /** Demo data (blog posts, forum threads) created by `npm run db:seed`. */
   seedDemo: bool(process.env.SEED_DEMO, true),
 } as const;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, Suspense } from 'react';
+import { lazy, useEffect, useRef, useState, Suspense } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   ChevronDown,
@@ -18,7 +18,11 @@ import { cn } from '../lib/utils';
 import { useOnClickOutside } from '../lib/hooks';
 import { Avatar, Button, Kbd, PageLoader } from './ui';
 import { ErrorBoundary } from './ErrorBoundary';
-import { SearchPalette } from './SearchPalette';
+
+// Search palette (and the icon registry it pulls in) is loaded on first open.
+const SearchPalette = lazy(() =>
+  import('./SearchPalette').then((module) => ({ default: module.SearchPalette })),
+);
 
 const navItems = [
   { to: '/tools', label: '工具库' },
@@ -382,7 +386,11 @@ export function Layout() {
         </ErrorBoundary>
       </main>
       <Footer />
-      <SearchPalette open={searchOpen} onClose={() => setSearchOpen(false)} />
+      {searchOpen ? (
+        <Suspense fallback={null}>
+          <SearchPalette open onClose={() => setSearchOpen(false)} />
+        </Suspense>
+      ) : null}
     </div>
   );
 }
