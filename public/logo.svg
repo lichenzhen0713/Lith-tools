@@ -1,28 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 120" width="128" height="120" role="img" aria-label="Lith Tools">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 120" role="img" aria-labelledby="ltTitle ltDesc">
+  <title id="ltTitle">Lith Tools</title>
+  <desc id="ltDesc">A toolbox with a handle, latch and the letter L.</desc>
   <defs>
-    <linearGradient id="ltBrackets" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4F46E5"/>
-      <stop offset="55%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
+    <linearGradient id="ltHandle" x1="44" y1="20" x2="84" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6366F1" />
+      <stop offset="1" stop-color="#06B6D4" />
     </linearGradient>
-    <linearGradient id="ltMonogram" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#06B6D4"/>
-      <stop offset="100%" stop-color="#22C55E"/>
+    <linearGradient id="ltBody" x1="18" y1="44" x2="110" y2="108" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F46E5" />
+      <stop offset="0.52" stop-color="#4F7BF7" />
+      <stop offset="1" stop-color="#06B6D4" />
+    </linearGradient>
+    <linearGradient id="ltLid" x1="18" y1="44" x2="110" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4338CA" />
+      <stop offset="1" stop-color="#0E9AC0" />
     </linearGradient>
   </defs>
 
-  <!-- 代码括号：代表工具与开发者生态 -->
-  <path d="M46 30 L22 58 L46 86" fill="none" stroke="url(#ltBrackets)" stroke-width="10"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M82 30 L106 58 L82 86" fill="none" stroke="url(#ltBrackets)" stroke-width="10"
-        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- handle -->
+  <path
+    d="M44 48V36c0-10.5 9-19 20-19s20 8.5 20 19v12"
+    fill="none"
+    stroke="url(#ltHandle)"
+    stroke-width="9"
+    stroke-linecap="round"
+  />
 
-  <!-- 中央 L 字母：Lith 的首字母，构成工具箱的把手 -->
-  <path d="M60 38 V74 H82" fill="none" stroke="url(#ltMonogram)" stroke-width="10"
-        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- toolbox body -->
+  <rect x="18" y="44" width="92" height="64" rx="14" fill="url(#ltBody)" />
 
-  <!-- 三个圆点：工具、内容、社区 -->
-  <circle cx="40" cy="104" r="5" fill="#4F46E5"/>
-  <circle cx="64" cy="104" r="5" fill="#06B6D4"/>
-  <circle cx="88" cy="104" r="5" fill="#22C55E"/>
+  <!-- lid + highlight -->
+  <path d="M18 58V58a14 14 0 0 1 14-14h64a14 14 0 0 1 14 14v2H18Z" fill="url(#ltLid)" />
+  <rect x="27" y="48" width="74" height="5" rx="2.5" fill="#FFFFFF" opacity="0.22" />
+  <path d="M18 64h92" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="2" />
+
+  <!-- latch -->
+  <rect x="55" y="49" width="18" height="14" rx="4" fill="#FFFFFF" />
+  <circle cx="64" cy="56" r="2.2" fill="#4F46E5" />
+
+  <!-- L monogram -->
+  <path d="M53 73v19h22" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- accent dot -->
+  <circle cx="99" cy="73" r="4" fill="#22C55E" />
 </svg>

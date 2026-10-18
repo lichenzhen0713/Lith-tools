@@ -108,11 +108,14 @@ export async function publicRoutes(app: FastifyInstance): Promise<void> {
   // ------------------------------------------------------------- site config
   app.get('/site', async () => {
     const { config } = await import('../config.js');
+    const { aiSettings, mailSettings } = await import('../lib/settings.js');
+    const mail = mailSettings();
+    const ai = aiSettings();
     return {
       name: config.appName,
       version: '2.0.0',
-      smtpConfigured: Boolean(config.smtp.host && config.smtp.user),
-      assistantConfigured: Boolean(config.deepseek.apiKey),
+      smtpConfigured: mail.configured,
+      assistantConfigured: ai.configured,
       registrationOpen: true,
     };
   });

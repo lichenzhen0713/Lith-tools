@@ -198,6 +198,13 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
 | DELETE | `/api/admin/bans/:ip` | 超级管理员 | 解封并归档历史 |
 | GET | `/api/admin/ban-history` | 超级管理员 | 封禁历史分页 |
 | GET | `/api/admin/access-logs` | 管理员 | 访问记录分页（含封禁状态） |
+| GET | `/api/admin/settings` | 超级管理员 | SMTP / DeepSeek 脱敏配置、来源（后台/环境变量） |
+| PUT | `/api/admin/settings/mail` | 超级管理员 | SMTP 配置；`pass` 留空保留，`clearPassword` 回退环境变量 |
+| PUT | `/api/admin/settings/ai` | 超级管理员 | DeepSeek Key / 接口 / 模型；`apiKey` 留空保留 |
+| POST | `/api/admin/settings/test-mail` | 超级管理员 | 发送测试邮件到当前管理员邮箱 |
+| POST | `/api/admin/settings/test-ai` | 超级管理员 | 用当前配置发起一次最小 DeepSeek 请求 |
+
+设置接口不会返回密码或 API Key 明文，只返回 `hasPassword` / `hasApiKey` 与末四位提示；保存后立即生效，无需重启。
 
 ## 网络代理
 

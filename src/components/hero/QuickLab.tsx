@@ -66,13 +66,13 @@ function CalcWidget() {
           onChange={(event) => setLeft(event.target.value)}
           inputMode="decimal"
           aria-label="第一个数字"
-          className="input h-12 text-center text-lg font-semibold"
+          className="input h-10 text-center text-lg font-semibold"
         />
         <select
           value={op}
           onChange={(event) => setOp(event.target.value)}
           aria-label="运算符"
-          className="input h-12 w-16 cursor-pointer px-0 text-center text-lg font-semibold"
+          className="input h-10 w-16 cursor-pointer px-0 text-center text-lg font-semibold"
         >
           <option value="+">+</option>
           <option value="-">−</option>
@@ -84,12 +84,12 @@ function CalcWidget() {
           onChange={(event) => setRight(event.target.value)}
           inputMode="decimal"
           aria-label="第二个数字"
-          className="input h-12 text-center text-lg font-semibold"
+          className="input h-10 text-center text-lg font-semibold"
         />
       </div>
-      <div className="mt-4 rounded-xl border border-[var(--card-border)] bg-[var(--hover-bg)] px-4 py-3 text-center">
-        <p className="text-[11px] text-[var(--text-muted)]">结果</p>
-        <p className="mt-1 truncate text-3xl font-extrabold tracking-tight text-[var(--brand)]">{result}</p>
+      <div className="mt-3 rounded-xl border border-[var(--card-border)] bg-[var(--hover-bg)] px-4 py-2 text-center">
+        <p className="text-[10.5px] text-[var(--text-muted)]">结果</p>
+        <p className="mt-0.5 truncate text-2xl font-extrabold tracking-tight text-[var(--brand)]">{result}</p>
       </div>
     </div>
   );
@@ -109,7 +109,7 @@ function ColorWidget() {
             type="color"
             value={color}
             onChange={(event) => setColor(event.target.value)}
-            className="h-20 w-20 cursor-pointer rounded-2xl border border-[var(--card-border)] bg-transparent p-1"
+            className="h-16 w-16 cursor-pointer rounded-2xl border border-[var(--card-border)] bg-transparent p-1"
           />
         </label>
         <div className="min-w-0">
@@ -183,7 +183,7 @@ function UnitWidget() {
       </div>
       <dl className="mt-4 divide-y rounded-xl border border-[var(--card-border)]">
         {rows.map(([label, amount, code]) => (
-          <div key={code} className="flex items-center justify-between px-3 py-2 text-sm">
+          <div key={code} className="flex items-center justify-between px-3 py-1.5 text-sm">
             <dt className="text-[var(--text-muted)]">
               {label} <span className="font-mono text-[10px] opacity-70">{code}</span>
             </dt>
@@ -251,7 +251,7 @@ function PasswordWidget() {
       >
         <RefreshCw className="size-3" /> 换一个
       </button>
-      <p className="mt-3 text-[11px] text-[var(--text-muted)]">由 crypto.getRandomValues 本地生成，不会上传或保存。</p>
+      <p className="mt-2 text-[11px] text-[var(--text-muted)]">本地生成，不会上传或保存。</p>
     </div>
   );
 }

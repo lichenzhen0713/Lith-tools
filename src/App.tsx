@@ -33,6 +33,7 @@ const AdminFeedback = lazy(() => import('./pages/admin/Feedback'));
 const AdminSubmissions = lazy(() => import('./pages/admin/Submissions'));
 const AdminBans = lazy(() => import('./pages/admin/Bans'));
 const AdminAccessLogs = lazy(() => import('./pages/admin/AccessLogs'));
+const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 
 export default function App() {
   return (
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="submissions" element={<AdminSubmissions />} />
           <Route path="bans" element={<AdminBans />} />
           <Route path="access-logs" element={<AdminAccessLogs />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

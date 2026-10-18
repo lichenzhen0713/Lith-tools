@@ -12,6 +12,7 @@ import {
   Menu,
   MessageSquare,
   RefreshCw,
+  Settings2,
   ShieldCheck,
   Users,
   Wrench,
@@ -44,6 +45,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { to: '/admin/submissions', label: '投稿', icon: Inbox },
   { to: '/admin/bans', label: '封禁 IP', icon: Ban, superOnly: true },
   { to: '/admin/access-logs', label: '访问记录', icon: Activity },
+  { to: '/admin/settings', label: '系统设置', icon: Settings2, superOnly: true },
 ];
 
 /** Breadcrumb / title lookup: longest matching path wins. */

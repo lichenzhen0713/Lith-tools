@@ -3,8 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   ArrowUpRight,
-  BookOpen,
-  Check,
   Layers,
   MessageSquare,
   Search,
@@ -78,9 +76,9 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="hero-glow absolute inset-0" aria-hidden="true" />
         <div className="grid-pattern absolute inset-0" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pt-14 pb-16 sm:px-6 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12 lg:pt-20 lg:pb-24">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 pt-8 pb-10 sm:px-6 lg:grid-cols-[1.04fr_0.96fr] lg:gap-10 lg:pt-10 lg:pb-14">
           <div className="text-center lg:text-left">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-3.5 py-1.5 text-xs text-[var(--text-secondary)] shadow-[var(--shadow-soft)]">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-1 text-[11.5px] text-[var(--text-secondary)] shadow-[var(--shadow-soft)]">
               <span className="size-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-[0_0_0_4px_rgba(99,102,241,0.14)]" />
               v2.0
               <span className="text-[var(--border-strong)]">·</span>
@@ -91,68 +89,53 @@ export default function Home() {
               本地处理
             </span>
 
-            <h1 className="mt-6 text-[clamp(2.45rem,5vw,4.15rem)] leading-[1.05] font-extrabold tracking-[-0.045em] text-balance">
-              把 70 个工具，
+            <h1 className="mt-4 text-[clamp(2.2rem,4.2vw,3.5rem)] leading-[1.06] font-extrabold tracking-[-0.045em] text-balance">
+              工具不用装，
               <br />
-              <span className="grad">装进一个标签页。</span>
+              <span className="grad">打开就能用。</span>
             </h1>
-            <p className="mx-auto mt-5 max-w-xl text-[15.5px] leading-[1.85] text-[var(--text-secondary)] sm:text-base lg:mx-0">
-              计算、转换、文本、图像与开发者工具。无需安装、无需上传，打开浏览器就能用。
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-[1.75] text-[var(--text-secondary)] sm:text-[15px] lg:mx-0">
+              计算、转换、文本、图像与开发者工具。70 个工具全部在浏览器本地运行，文件不会上传。
             </p>
 
             <form
               onSubmit={submitSearch}
-              className="mx-auto mt-7 flex max-w-xl items-center gap-2 rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-2 shadow-[var(--shadow-soft)] transition-colors focus-within:border-[var(--border-strong)] lg:mx-0"
+              className="mx-auto mt-5 flex max-w-lg items-center gap-1.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-1.5 shadow-[var(--shadow-soft)] transition-colors focus-within:border-[var(--border-strong)] lg:mx-0"
             >
-              <Search className="ml-2 size-5 shrink-0 text-[var(--text-muted)]" />
+              <Search className="ml-2 size-4.5 shrink-0 text-[var(--text-muted)]" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="搜索工具，例如 JSON、二维码…"
                 aria-label="搜索工具"
-                className="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--text-muted)]"
+                className="h-9 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--text-muted)]"
               />
-              <button type="submit" className="btn-primary shrink-0">
+              <button type="submit" className="btn-primary btn-sm shrink-0">
                 搜索
-                <ArrowRight className="size-4" />
+                <ArrowRight className="size-3.5" />
               </button>
             </form>
 
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs lg:justify-start">
-              <span className="text-[var(--text-muted)]">热门</span>
-              {popular.map((tool) => (
+            <div className="mt-2.5 flex flex-wrap items-center justify-center gap-1.5 text-[11.5px] lg:justify-start">
+              <span className="mr-1 text-[var(--text-muted)]">热门</span>
+              {popular.slice(0, 3).map((tool) => (
                 <Link key={tool.id} to={`/tools/${tool.slug}`} className="chip">
                   {tool.name}
                 </Link>
               ))}
             </div>
 
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
               <Link to="/tools" className="btn-primary">
                 浏览全部工具 <ArrowRight className="size-4" />
               </Link>
               <a href="#categories" className="btn-secondary">
                 <Layers className="size-4" /> 按分类浏览
               </a>
-              <Link to="/blog" className="btn-ghost">
-                <BookOpen className="size-4" /> 阅读博客
-              </Link>
-            </div>
-
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11.5px] text-[var(--text-muted)] lg:justify-start">
-              <span className="flex items-center gap-1">
-                <Check className="size-3.5 text-emerald-500" /> 无需安装
-              </span>
-              <span className="flex items-center gap-1">
-                <Check className="size-3.5 text-emerald-500" /> 文件不上传
-              </span>
-              <span className="flex items-center gap-1">
-                <Check className="size-3.5 text-emerald-500" /> MIT 开源
-              </span>
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[440px] lg:max-w-none">
+          <div className="relative mx-auto w-full max-w-[400px] lg:max-w-none">
             <div
               className="pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-gradient-to-br from-indigo-500/20 via-violet-500/10 to-cyan-400/20 blur-2xl"
               aria-hidden="true"

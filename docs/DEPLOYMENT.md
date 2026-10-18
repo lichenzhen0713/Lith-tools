@@ -42,6 +42,8 @@ NODE_ENV=production node dist-server/server/index.js
 | `DEEPSEEK_BASE_URL` | `https://api.deepseek.com/v1` | OpenAI 兼容接口地址 |
 | `COOKIE_SECURE` | 保持默认 | 本地 HTTP 验证生产构建时临时设为 `false` |
 
+> SMTP 与 DeepSeek 也可以在 **管理后台 → 系统设置** 中配置，保存后立即生效；后台值优先于环境变量。密钥保存在 SQLite 的 `settings` 表中，请确保 `data/` 目录仅服务账户可读。
+
 ## systemd 示例
 
 ```ini

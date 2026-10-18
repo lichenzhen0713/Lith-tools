@@ -1,13 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Lith Tools">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lith Tools">
   <defs>
-    <linearGradient id="ltIcon" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4F46E5"/>
-      <stop offset="55%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
+    <linearGradient id="favBg" x1="6" y1="4" x2="58" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F46E5" />
+      <stop offset="0.55" stop-color="#4F7BF7" />
+      <stop offset="1" stop-color="#06B6D4" />
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="15" fill="url(#ltIcon)"/>
-  <path d="M22 16 V43 H42" fill="none" stroke="#FFFFFF" stroke-width="7"
-        stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="45" cy="45" r="4" fill="#A5F3FC"/>
+  <rect width="64" height="64" rx="16" fill="url(#favBg)" />
+  <path d="M23 28v-5a9 9 0 0 1 18 0v5" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" />
+  <rect x="12" y="26" width="40" height="27" rx="7" fill="#FFFFFF" />
+  <path d="M12 34h40" stroke="#4F46E5" stroke-opacity="0.28" stroke-width="2" />
+  <rect x="27" y="30" width="10" height="8" rx="2.5" fill="#4F46E5" />
+  <path d="M28 41v7h10" fill="none" stroke="#4F46E5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="48" cy="48" r="3" fill="#22C55E" />
 </svg>

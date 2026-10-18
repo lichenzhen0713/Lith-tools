@@ -1,4 +1,4 @@
-import { config } from '../config.js';
+import { aiSettings } from './settings.js';
 import { ApiError } from './security.js';
 
 export type AssistantModeId = 'chat' | 'reasoning' | 'code' | 'translate' | 'writing';
@@ -15,17 +15,26 @@ export interface AssistantMode {
 const BASE_PROMPT =
   '你是 Lith Tools 内置的 AI 助手。使用简体中文回答，保持准确、简洁、可操作；涉及代码时使用 Markdown 代码块；不确定的内容要明确说明，不要编造。';
 
+interface ModeDefinition {
+  id: AssistantModeId;
+  name: string;
+  description: string;
+  kind: 'chat' | 'reasoning';
+  temperature?: number;
+  systemPrompt: string;
+}
+
 /**
- * Five modes share one OpenAI-compatible endpoint. `deepseek-reasoner` returns
- * an extra `reasoning_content` field which the UI renders as a collapsible
- * "thinking" block; the other modes use `deepseek-chat` with different prompts.
+ * Five modes share one OpenAI-compatible endpoint. Model names are resolved
+ * from runtime settings (admin panel or env), so changes take effect without a
+ * restart. `deepseek-reasoner` also returns `reasoning_content`.
  */
-export const assistantModes: AssistantMode[] = [
+const MODE_DEFINITIONS: ModeDefinition[] = [
   {
     id: 'chat',
     name: '通用对话',
     description: '日常问答、工具用法与想法整理',
-    model: config.deepseek.chatModel,
+    kind: 'chat',
     temperature: 0.7,
     systemPrompt: BASE_PROMPT,
   },
@@ -33,14 +42,14 @@ export const assistantModes: AssistantMode[] = [
     id: 'reasoning',
     name: '深度思考',
     description: '复杂问题拆解，展示推理过程',
-    model: config.deepseek.reasoningModel,
+    kind: 'reasoning',
     systemPrompt: `${BASE_PROMPT}\n\n当前为深度思考模式：先充分分析问题、列出关键假设，再给出结论。结论要有条理，必要时给出步骤或验证方法。`,
   },
   {
     id: 'code',
     name: '代码助手',
     description: '写代码、查 Bug、解释实现',
-    model: config.deepseek.chatModel,
+    kind: 'chat',
     temperature: 0.2,
     systemPrompt: `${BASE_PROMPT}\n\n当前为代码助手模式：优先给出可运行、类型安全的代码；指明语言与版本；解释关键取舍；如果信息不足，先说明需要的上下文。`,
   },
@@ -48,7 +57,7 @@ export const assistantModes: AssistantMode[] = [
     id: 'translate',
     name: '翻译润色',
     description: '中英互译与语气润色',
-    model: config.deepseek.chatModel,
+    kind: 'chat',
     temperature: 0.3,
     systemPrompt: `${BASE_PROMPT}\n\n当前为翻译润色模式：先给出自然、地道的译文，再简要说明关键用词或语气选择；保留原文格式与专有名词。`,
   },
@@ -56,26 +65,41 @@ export const assistantModes: AssistantMode[] = [
     id: 'writing',
     name: '写作助手',
     description: '提纲、文案、文章修改',
-    model: config.deepseek.chatModel,
+    kind: 'chat',
     temperature: 0.85,
     systemPrompt: `${BASE_PROMPT}\n\n当前为写作助手模式：先理解目标读者与语气，再给出结构清晰、有细节的文本；避免空泛套话，必要时提供两个版本。`,
   },
 ];
 
+export const ASSISTANT_MODE_IDS = MODE_DEFINITIONS.map((mode) => mode.id) as [
+  AssistantModeId,
+  ...AssistantModeId[],
+];
+
+export function assistantModes(): AssistantMode[] {
+  const ai = aiSettings();
+  return MODE_DEFINITIONS.map(({ kind, ...mode }) => ({
+    ...mode,
+    model: kind === 'reasoning' ? ai.reasoningModel : ai.chatModel,
+  }));
+}
+
 export function assistantConfigured(): boolean {
-  return Boolean(config.deepseek.apiKey);
+  return aiSettings().configured;
 }
 
 export function modeById(id: string | undefined): AssistantMode {
-  return assistantModes.find((mode) => mode.id === id) ?? assistantModes[0];
+  const modes = assistantModes();
+  return modes.find((mode) => mode.id === id) ?? modes[0];
 }
 
 export function assistantStatus() {
+  const modes = assistantModes();
   return {
     configured: assistantConfigured(),
     provider: 'deepseek' as const,
-    defaultMode: assistantModes[0].id,
-    modes: assistantModes.map((mode) => ({
+    defaultMode: modes[0].id,
+    modes: modes.map((mode) => ({
       id: mode.id,
       name: mode.name,
       description: mode.description,
@@ -97,8 +121,9 @@ export interface ChatResult {
 }
 
 export async function chatWithDeepSeek(mode: AssistantMode, messages: ChatMessage[]): Promise<ChatResult> {
-  if (!config.deepseek.apiKey) {
-    throw new ApiError(503, 'AI 助手尚未配置。请设置 DEEPSEEK_API_KEY 后重启服务。');
+  const ai = aiSettings();
+  if (!ai.configured) {
+    throw new ApiError(503, 'AI 助手尚未配置。请由管理员在「后台 → 系统设置」填写 DeepSeek Key。');
   }
 
   const controller = new AbortController();
@@ -115,12 +140,12 @@ export async function chatWithDeepSeek(mode: AssistantMode, messages: ChatMessag
   if (mode.temperature !== undefined) body.temperature = mode.temperature;
 
   try {
-    const response = await fetch(`${config.deepseek.baseUrl}/chat/completions`, {
+    const response = await fetch(`${ai.baseUrl}/chat/completions`, {
       method: 'POST',
       signal: controller.signal,
       headers: {
         'content-type': 'application/json',
-        authorization: `Bearer ${config.deepseek.apiKey}`,
+        authorization: `Bearer ${ai.apiKey}`,
       },
       body: JSON.stringify(body),
     });

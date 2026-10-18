@@ -231,6 +231,17 @@ const migrations: Migration[] = [
       );
     `,
   },
+  {
+    version: 2,
+    name: 'runtime settings',
+    sql: /* sql */ `
+      CREATE TABLE settings (
+        key         TEXT PRIMARY KEY,
+        value       TEXT NOT NULL,
+        updated_at  TEXT NOT NULL
+      );
+    `,
+  },
 ];
 
 export function migrate(): void {

@@ -1,18 +1,21 @@
 import nodemailer, { type Transporter } from 'nodemailer';
-import { config, hasSmtp } from '../config.js';
+import { mailSettings, type MailSettings } from './settings.js';
 
 let transporter: Transporter | null = null;
+let transporterKey = '';
 
-function getTransporter(): Transporter | null {
-  if (!hasSmtp) return null;
-  if (transporter) return transporter;
+function getTransporter(settings: MailSettings): Transporter | null {
+  if (!settings.configured) return null;
+  const key = JSON.stringify([settings.host, settings.port, settings.secure, settings.user, settings.pass]);
+  if (transporter && key === transporterKey) return transporter;
   transporter = nodemailer.createTransport({
-    host: config.smtp.host,
-    port: config.smtp.port,
-    secure: config.smtp.secure,
-    auth: { user: config.smtp.user, pass: config.smtp.pass },
+    host: settings.host,
+    port: settings.port,
+    secure: settings.secure,
+    auth: { user: settings.user, pass: settings.pass },
     connectionTimeout: 15_000,
   });
+  transporterKey = key;
   return transporter;
 }
 
@@ -37,14 +40,15 @@ export interface MailResult {
 }
 
 export async function sendMail(to: string, subject: string, html: string): Promise<MailResult> {
-  const tx = getTransporter();
+  const settings = mailSettings();
+  const tx = getTransporter(settings);
   if (!tx) {
     console.log(`[mail:dev] to=${to} subject=${subject}`);
     return { delivered: false, error: 'SMTP 未配置' };
   }
   try {
     await tx.sendMail({
-      from: config.smtp.from || `Lith Tools <${config.smtp.user}>`,
+      from: settings.from || `Lith Tools <${settings.user}>`,
       to,
       subject,
       html,
@@ -53,6 +57,20 @@ export async function sendMail(to: string, subject: string, html: string): Promi
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error('[mail] send failed:', message);
+    return { delivered: false, error: message };
+  }
+}
+
+/** SMTP connectivity check used by the admin settings page. */
+export async function verifyMail(): Promise<MailResult> {
+  const settings = mailSettings();
+  const tx = getTransporter(settings);
+  if (!tx) return { delivered: false, error: 'SMTP 尚未配置（需要服务器地址与用户名）' };
+  try {
+    await tx.verify();
+    return { delivered: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     return { delivered: false, error: message };
   }
 }

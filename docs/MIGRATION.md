@@ -14,7 +14,7 @@
 
 | 旧版 | 新版 | 原因 |
 | --- | --- | --- |
-| 明文数据库/SMTP/AI 密钥 | 全部环境变量；DeepSeek 密钥仅服务端 | 安全 |
+| 明文数据库/SMTP/AI 密钥 | 环境变量或后台设置（SQLite）；DeepSeek 密钥仅服务端 | 安全 |
 | 手写 SQL + 个别字符串拼接 | 参数化查询 + zod 校验 | 防注入 |
 | Markdown → `innerHTML` | `marked` + `DOMPurify` + KaTeX | 防存储型 XSS |
 | 缺少 CSRF/限流 | Origin 校验 + 分组限流 | 防 CSRF/暴力破解 |

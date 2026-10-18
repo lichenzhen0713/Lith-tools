@@ -516,11 +516,11 @@
   .stats-band {
     border-block: 1px solid var(--card-border);
     background: var(--card-bg);
-    padding: 28px 0;
+    padding: 18px 0;
   }
   .stat-number {
     display: block;
-    font-size: clamp(24px, 3vw, 34px);
+    font-size: clamp(22px, 2.6vw, 28px);
     font-weight: 800;
     letter-spacing: -0.02em;
     background: linear-gradient(120deg, var(--brand), var(--brand-2));
@@ -847,7 +847,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-bottom: 1px solid var(--card-border);
     background: var(--hover-bg);
     font-size: 12px;
@@ -857,7 +857,7 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
-    padding: 7px;
+    padding: 6px;
     border-bottom: 1px solid var(--card-border);
     background: var(--hover-bg);
   }
@@ -867,8 +867,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 8px 4px;
+    gap: 3px;
+    padding: 6px 4px;
     border: 0;
     border-radius: 10px;
     background: transparent;
@@ -886,15 +886,15 @@
     box-shadow: var(--shadow-soft);
   }
   .hero-lab-body {
-    min-height: 206px;
-    padding: 16px;
+    min-height: 160px;
+    padding: 14px;
   }
   .hero-lab-foot {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-top: 1px solid var(--card-border);
     color: var(--text-muted);
     font-size: 11.5px;

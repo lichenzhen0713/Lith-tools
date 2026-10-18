@@ -63,12 +63,12 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 
 ### 管理后台
 
-数据概览、用户管理（角色/封禁/删除）、工具上下架与外链工具、博客与分类管理、反馈处理、工具/博客投稿审核、IP 封禁与历史、访问记录与访问统计。
+数据概览、用户管理（角色/封禁/删除）、工具上下架与外链工具、博客与分类管理、反馈处理、工具/博客投稿审核、IP 封禁与历史、访问记录与访问统计，以及 **SMTP 邮件与 DeepSeek AI 的在线配置**（保存即生效，密钥不回显）。
 
 ### 可选集成
 
 - **邮件**：配置 SMTP 后发送验证码、重置链接与审核通知。
-- **AI 助手**：接入 DeepSeek，支持通用对话、深度思考（展示推理过程）、代码、翻译与写作五种模式；密钥只保存在服务端。
+- **AI 助手**：接入 DeepSeek，支持通用对话、深度思考（展示推理过程）、代码、翻译与写作五种模式；密钥只保存在服务端，可在管理后台填写，环境变量作为默认值。
 
 ## 截图
 
@@ -84,9 +84,13 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 | --- | --- |
 | ![管理后台](docs/screenshots/admin-overview.png) | ![AI 助手](docs/screenshots/assistant.png) |
 
-| 深色模式 | 移动端 |
+| 系统设置 | 深色模式 |
 | --- | --- |
-| ![深色模式](docs/screenshots/home-dark.png) | ![移动端](docs/screenshots/home-mobile.png) |
+| ![系统设置](docs/screenshots/admin-settings.png) | ![深色模式](docs/screenshots/home-dark.png) |
+
+| 论坛 | 移动端 |
+| --- | --- |
+| ![论坛](docs/screenshots/forum-list.png) | ![移动端](docs/screenshots/home-mobile.png) |
 
 ## 技术栈
 
@@ -154,7 +158,7 @@ docker compose up -d --build
 
 ## 配置
 
-复制 `.env.example` 为 `.env`。所有配置均有默认值：
+复制 `.env.example` 为 `.env`。所有配置均有默认值；邮件与 AI 也可以在 **管理后台 → 系统设置** 中填写，后台值优先于环境变量：
 
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
@@ -212,7 +216,7 @@ docker compose up -d --build
 - KaTeX 从 Markdown 默认依赖中移出，仅在有公式时按需加载；构建时裁剪 ttf/woff 旧字体（**−0.78 MB**）。
 - `html2canvas`、`JSZip`、二维码等仅在对应工具中懒加载。
 - 全站 Brotli/gzip 压缩；带哈希的静态资源使用一年 `immutable` 缓存，`index.html` 保持 `no-cache`。
-- `dist/` 总体积从 3.5 MB 降至 **2.31 MB**（仍包含全部工具与 woff2 字体）。
+- `dist/` 总体积约 **2.3 MB**（仍包含全部工具与 woff2 字体）。
 
 ## 目录结构
 
@@ -275,6 +279,7 @@ Fastify
 | 管理 | `/api/admin/users`、`/admin/tools`、`/admin/submissions`、`/admin/bans` |
 | 网络 | `GET /api/net/ip`、`/net/dns`、`/net/rates`；`POST /net/ping` |
 | AI | `GET /api/assistant/status`；`POST /api/assistant/chat`（5 种模式，登录 + 限流） |
+| 系统设置 | `GET /api/admin/settings`；`PUT /api/admin/settings/mail`、`/settings/ai`；`POST /settings/test-mail`、`/settings/test-ai`（超级管理员） |
 
 ## 安全
 

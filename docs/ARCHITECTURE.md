@@ -61,12 +61,14 @@
 | `server/index.ts` | 启动：迁移 → 种子 → 监听 → 定时维护 → 优雅退出 |
 | `server/app.ts` | Fastify 实例、钩子、路由注册、静态资源、404/错误处理 |
 | `server/config.ts` | 环境变量（`process.loadEnvFile` + 默认值） |
+| `server/lib/settings.ts` | 运行时设置：SQLite `settings` 覆盖环境变量（SMTP / DeepSeek），脱敏视图 |
 | `server/db/client.ts` | `DatabaseSync` 单例、`all/get/run/count`、嵌套事务 |
 | `server/db/schema.ts` | 顺序迁移（`PRAGMA user_version`） |
 | `server/db/seed.ts` | 幂等种子：分类、70 个工具、管理员、示例内容 |
 | `server/lib/auth.ts` | 会话签发/解析、Cookie、角色守卫、过期清理 |
 | `server/lib/security.ts` | scrypt、随机令牌、限流、SHA-256 |
-| `server/lib/email.ts` | 可选 SMTP 与邮件模板 |
+| `server/lib/email.ts` | SMTP 邮件模板；配置动态读取，后台保存后立即生效 |
+| `server/lib/deepseek.ts` | DeepSeek 5 种模式、推理内容、错误映射 |
 | `server/lib/access.ts` | IP 封禁、解封、过期归档、访问计数、403 页面 |
 | `server/lib/validation.ts` | zod 规则、分页、ID/URL 校验、Markdown 摘要 |
 | `server/routes/*.ts` | 按领域划分的 HTTP 路由 |
@@ -81,6 +83,7 @@
 | --- | --- | --- |
 | 账户 | `users`、`sessions`、`email_verifications`、`password_resets` | 会话/验证码按用户或邮箱关联；重置令牌只存哈希 |
 | 工具 | `tool_categories`、`tools` | 工具属于分类；内置工具用 `slug` 指向 SPA 路由，外链工具用 `link` |
+| 系统 | `settings` | 键值配置：SMTP / DeepSeek；后台值覆盖环境变量 |
 | 博客 | `blogs`、`blog_comments`、`blog_likes`、`blog_submissions`、`categories` | 博客属于作者与分类；评论/点赞级联删除；投稿保留审核状态 |
 | 论坛 | `forums`、`threads`、`posts` | 板块 → 主题 → 回复，级联删除 |
 | 互动 | `user_feedback`、`user_submissions` | 保留状态（open/resolved/ignored、pending/approved/rejected） |
@@ -148,7 +151,7 @@ shared/catalog.ts  ──seed──▶  tools 表 ──GET /api/tools──▶ 
 | 会话固定/劫持 | 登录轮换会话；HttpOnly；生产 Secure |
 | IP 封禁绕过 | 请求级拦截；内网探测与端口限制 |
 | SSRF | 网络工具仅允许公网地址与 80/443/8080/8443 |
-| 密钥泄露 | 全部走环境变量；前端不接触 AI/SMTP 密钥 |
+| 密钥泄露 | 环境变量或后台设置（仅服务端）；前端只拿到脱敏标志 |
 
 细节与部署加固见 [`SECURITY.md`](SECURITY.md)。
 

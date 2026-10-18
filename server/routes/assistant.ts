@@ -2,8 +2,8 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { requireUser } from '../lib/auth.js';
 import {
+  ASSISTANT_MODE_IDS,
   assistantConfigured,
-  assistantModes,
   assistantStatus,
   chatWithDeepSeek,
   modeById,
@@ -17,7 +17,7 @@ const messageSchema = z.object({
   content: z.string().trim().min(1).max(6000),
 });
 
-const modeIds = assistantModes.map((mode) => mode.id) as [AssistantModeId, ...AssistantModeId[]];
+const modeIds = ASSISTANT_MODE_IDS;
 
 export async function assistantRoutes(app: FastifyInstance): Promise<void> {
   app.get('/assistant/status', async () => assistantStatus());
@@ -27,7 +27,7 @@ export async function assistantRoutes(app: FastifyInstance): Promise<void> {
     rateLimit(`assistant:${user.id}`, 30, 60 * 60_000);
 
     if (!assistantConfigured()) {
-      throw new ApiError(503, 'AI 助手尚未配置。管理员设置 DEEPSEEK_API_KEY 后重启服务即可使用。');
+      throw new ApiError(503, 'AI 助手尚未配置。请由管理员在「后台 → 系统设置」填写 DeepSeek Key。');
     }
 
     const body = parse(

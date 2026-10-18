@@ -57,7 +57,7 @@ console.log(`\nLith Tools UI check → ${base}\n`);
 // ------------------------------------------------------------------ homepage
 await check('home renders', async () => {
   await go('/');
-  await page.getByRole('heading', { name: /装进一个标签页/ }).waitFor({ timeout: 15_000 });
+  await page.getByRole('heading', { name: /打开就能用/ }).waitFor({ timeout: 15_000 });
   await page.getByRole('heading', { name: '最常用的工具，一步直达' }).waitFor({ timeout: 10_000 });
   await shot('home-light');
   return 'hero + featured + categories';
@@ -174,7 +174,7 @@ await check('mobile home', async () => {
   const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   const mobilePage = await mobile.newPage();
   await mobilePage.goto(`${base}/`, { waitUntil: 'networkidle' });
-  await mobilePage.getByRole('heading', { name: /装进一个标签页/ }).waitFor({ timeout: 10_000 });
+  await mobilePage.getByRole('heading', { name: /打开就能用/ }).waitFor({ timeout: 10_000 });
   await mobilePage.screenshot({ path: path.join(outDir, 'home-mobile.png') });
   await mobile.close();
   return 'responsive header + hero';

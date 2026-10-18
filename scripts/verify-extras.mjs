@@ -28,6 +28,19 @@ await page.getByRole('button', { name: /深度思考/ }).click();
 await page.waitForTimeout(400);
 await page.screenshot({ path: 'screenshots/assistant.png', fullPage: false });
 
+// admin settings: masked view + runtime source
+const settings = await page.evaluate(async () => {
+  const response = await fetch('/api/admin/settings');
+  return { status: response.status, data: await response.json() };
+});
+if (settings.status !== 200) failures.push(`admin settings returned ${settings.status}`);
+if (settings.data?.ai && ('apiKey' in settings.data.ai || 'pass' in (settings.data.mail ?? {}))) {
+  failures.push('admin settings leaked a secret field');
+}
+if (!settings.data?.ai?.hasApiKey && !settings.data?.ai?.configured) {
+  failures.push('admin settings missing AI status');
+}
+
 // KaTeX after pruning legacy fonts
 await page.goto(`${base}/blog/2`, { waitUntil: 'domcontentloaded' });
 await page.locator('.katex').first().waitFor({ timeout: 15_000 });
