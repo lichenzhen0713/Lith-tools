@@ -1,0 +1,29 @@
+# Lith Tools systemd 模板
+#
+# 使用 deploy/install.sh 会自动生成带真实路径的版本；手动部署时：
+#   sudo cp deploy/lith-tools.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now lith-tools
+#
+# 请按实际部署修改 WorkingDirectory / ExecStart / User / ReadWritePaths。
+
+[Unit]
+Description=Lith Tools
+After=network.target
+
+[Service]
+Type=simple
+User=lith
+Group=lith
+WorkingDirectory=/opt/lith-tools
+EnvironmentFile=/opt/lith-tools/.env
+ExecStart=/usr/bin/node /opt/lith-tools/dist-server/server/index.js
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/lith-tools/data
+
+[Install]
+WantedBy=multi-user.target

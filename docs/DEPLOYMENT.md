@@ -11,6 +11,32 @@
 
 不需要 MySQL、PHP、Redis、Docker 或原生编译工具链。
 
+## 一键部署
+
+### Linux（含宝塔 / 小皮 Linux 版）
+
+```bash
+sudo bash deploy/install.sh --origin https://tools.example.com
+```
+
+脚本会自动检查/安装 Node 24、安装依赖、构建、生成 `.env`（随机管理员密码），
+并在 systemd 可用时创建并启动 `lith-tools` 服务。
+
+面板部署（由面板管理进程，不安装 systemd）：
+
+```bash
+bash deploy/install.sh --no-service
+```
+
+### Windows（含小皮 Windows 版）
+
+```bat
+deploy\install.bat
+```
+
+安装依赖、构建、生成 `.env` 并前台启动。宝塔 / 小皮的详细操作、反向代理、HTTPS、PM2 与排错见
+[面板部署指南](PANEL.md)。
+
 ## 构建与启动
 
 ```bash
@@ -46,6 +72,8 @@ NODE_ENV=production node dist-server/server/index.js
 
 ## systemd 示例
 
+仓库提供 [`deploy/lith-tools.service`](../deploy/lith-tools.service) 模板；`deploy/install.sh` 会按实际路径自动生成并安装。
+
 ```ini
 # /etc/systemd/system/lith-tools.service
 [Unit]
@@ -76,6 +104,8 @@ sudo journalctl -u lith-tools -f
 ```
 
 ## Nginx 反向代理
+
+仓库提供 [`deploy/nginx-lith-tools.conf`](../deploy/nginx-lith-tools.conf) 模板，宝塔 / 小皮可直接在面板里把反向代理指向 `http://127.0.0.1:8787`。
 
 ```nginx
 server {

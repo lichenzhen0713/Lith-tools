@@ -15,7 +15,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](tsconfig.json)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md)
 
-[功能](#功能) · [截图](#截图) · [快速开始](#快速开始) · [配置](#配置) · [架构](docs/ARCHITECTURE.md) · [API](docs/API.md) · [部署](docs/DEPLOYMENT.md) · [贡献](docs/CONTRIBUTING.md) · [更新日志](docs/CHANGELOG.md)
+[功能](#功能) · [截图](#截图) · [快速开始](#快速开始) · [配置](#配置) · [架构](docs/ARCHITECTURE.md) · [API](docs/API.md) · [部署](docs/DEPLOYMENT.md) · [宝塔/小皮](docs/PANEL.md) · [贡献](docs/CONTRIBUTING.md) · [更新日志](docs/CHANGELOG.md)
 
 </div>
 
@@ -150,6 +150,25 @@ NODE_ENV=production node dist-server/server/index.js
 
 单进程同时提供 API 与静态资源，默认 <http://127.0.0.1:8787>。生产环境请通过 HTTPS 访问；本地用 HTTP 验证生产构建时设置 `COOKIE_SECURE=false`。
 
+### 一键部署 / 面板部署
+
+Linux（含宝塔 / 小皮 Linux 版）：
+
+```bash
+sudo bash deploy/install.sh --origin https://tools.example.com
+# 面板只构建、不安装 systemd：
+bash deploy/install.sh --no-service
+```
+
+Windows（含小皮 Windows 版）：
+
+```bat
+deploy\install.bat
+```
+
+脚本会安装依赖、构建、生成带随机管理员密码的 `.env`。宝塔 / 小皮的 Node 项目、PM2、反向代理、HTTPS
+与排错步骤见 **[docs/PANEL.md](docs/PANEL.md)**；通用部署说明见 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)。
+
 ### Docker
 
 ```bash
@@ -197,6 +216,9 @@ docker compose up -d --build
 | `npm run verify:extras` | 校验 AI 五种模式、KaTeX 渲染与字体加载 |
 | `npm run snapshot` | 生成完整页面截图（视觉回归用） |
 | `npm run docs:map` | 重新生成 `docs/URL-MAP.md` |
+| `bash deploy/install.sh` | Linux 一键部署（安装 Node、构建、生成 `.env`、systemd） |
+| `deploy\install.bat` | Windows 一键部署（构建、生成 `.env`、启动） |
+| `pm2 start deploy/ecosystem.config.cjs` | 用 PM2 守护运行 |
 
 ## 测试与质量
 
@@ -246,7 +268,8 @@ lith-tools/
 │  ├─ tools/               # 每个工具一个懒加载组件 + kit
 │  └─ styles/index.css     # Tailwind v4 设计令牌与组件类
 ├─ scripts/                # smoke / tools-check / ui-check / 文档生成
-├─ docs/                   # 架构、API、部署、迁移、URL 对照、截图
+├─ deploy/                 # 一键安装、面板启动、systemd / PM2 / Nginx 模板
+├─ docs/                   # 架构、API、部署、面板、迁移、URL 对照、截图
 ├─ .github/                # CI、Issue/PR 模板、Dependabot
 ├─ Dockerfile / docker-compose.yml
 └─ data/lith-tools.db      # SQLite（首次运行生成，已 gitignore）
