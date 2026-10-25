@@ -190,6 +190,7 @@ export default function Dashboard() {
   }
 
   const counts = overview.data?.counts;
+  const canPublish = user.role >= 1;
 
   const tabs: { value: TabKey; label: string; count?: number }[] = [
     { value: 'overview', label: '概览' },
@@ -207,8 +208,8 @@ export default function Dashboard() {
         description="查看你的内容与互动记录，管理账户信息与登录安全。"
         actions={
           <>
-            <Link to="/blog/new" className="btn-secondary btn-sm">
-              <Plus className="size-3.5" /> 写文章
+            <Link to={canPublish ? '/blog/new' : '/submit/blog'} className="btn-secondary btn-sm">
+              <Plus className="size-3.5" /> {canPublish ? '写文章' : '投稿文章'}
             </Link>
             <Link to="/feedback" className="btn-primary btn-sm">
               <MessageSquare className="size-3.5" /> 意见反馈
@@ -227,6 +228,7 @@ export default function Dashboard() {
             blogs={overview.data?.blogs ?? []}
             loading={overview.loading}
             error={overview.error}
+            canPublish={canPublish}
             onChanged={() => overview.reload()}
           />
         ) : tab === 'submissions' ? (
@@ -262,6 +264,7 @@ function OverviewTab({
   };
 }) {
   const role = roleMeta(user.role);
+  const canPublish = user.role >= 1;
   const data = overview.data;
 
   return (
@@ -358,11 +361,15 @@ function OverviewTab({
             <EmptyState
               icon={BookOpen}
               title="还没有发布文章"
-              description="写下第一篇技术分享，让更多人看到你的经验。"
+              description={
+                canPublish
+                  ? '写下第一篇技术分享，让更多人看到你的经验。'
+                  : '投稿一篇教程或经验分享，审核通过后会发布到博客频道。'
+              }
               className="border-0"
               action={
-                <Link to="/blog/new" className="btn-primary btn-sm">
-                  开始写作
+                <Link to={canPublish ? '/blog/new' : '/submit/blog'} className="btn-primary btn-sm">
+                  {canPublish ? '开始写作' : '投稿文章'}
                 </Link>
               }
             />
@@ -394,11 +401,13 @@ function BlogsTab({
   blogs,
   loading,
   error,
+  canPublish,
   onChanged,
 }: {
   blogs: OverviewBlog[];
   loading: boolean;
   error: string | null;
+  canPublish: boolean;
   onChanged: () => void;
 }) {
   const toast = useToast();
@@ -425,10 +434,14 @@ function BlogsTab({
       <Card>
         <CardHeader
           title="我的文章"
-          description="管理你发布的所有文章，可编辑内容或删除。"
+          description={
+            canPublish
+              ? '管理你发布的所有文章，可编辑内容或删除。'
+              : '你已发布的文章；新内容请通过「投稿文章」提交审核。'
+          }
           action={
-            <Link to="/blog/new" className="btn-primary btn-sm">
-              <Plus className="size-3.5" /> 新建文章
+            <Link to={canPublish ? '/blog/new' : '/submit/blog'} className="btn-primary btn-sm">
+              <Plus className="size-3.5" /> {canPublish ? '新建文章' : '投稿文章'}
             </Link>
           }
         />
@@ -448,12 +461,16 @@ function BlogsTab({
           <EmptyState
             icon={BookOpen}
             title="还没有文章"
-            description="写下第一篇技术分享，或者先浏览社区里的公开文章。"
+            description={
+              canPublish
+                ? '写下第一篇技术分享，或者先浏览社区里的公开文章。'
+                : '投稿一篇教程或经验分享，审核通过后就会出现在这里。'
+            }
             className="border-0"
             action={
               <div className="flex flex-wrap justify-center gap-2">
-                <Link to="/blog/new" className="btn-primary">
-                  写第一篇
+                <Link to={canPublish ? '/blog/new' : '/submit/blog'} className="btn-primary">
+                  {canPublish ? '写第一篇' : '去投稿'}
                 </Link>
                 <Link to="/blog" className="btn-secondary">
                   浏览博客
@@ -483,9 +500,11 @@ function BlogsTab({
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                  <Link to={`/blog/${blog.id}/edit`} className="btn-ghost btn-sm">
-                    <Pencil className="size-3.5" /> 编辑
-                  </Link>
+                  {canPublish ? (
+                    <Link to={`/blog/${blog.id}/edit`} className="btn-ghost btn-sm">
+                      <Pencil className="size-3.5" /> 编辑
+                    </Link>
+                  ) : null}
                   <Button
                     variant="ghost"
                     size="sm"

@@ -68,7 +68,8 @@ function toListItem(row: BlogRow, user: SessionUser | null): BlogListItem {
     comments: Number(row.comments ?? 0),
     createdAt: row.created_at,
     updatedAt: row.latest_at,
-    canEdit: Boolean(user && (user.role === 2 || user.id === row.author_id)),
+    // 直接发布/编辑文章仅限管理员；普通用户只能通过「投稿文章」提交审核。
+    canEdit: Boolean(user && user.role >= 1),
   };
 }
 
@@ -221,6 +222,9 @@ export async function blogRoutes(app: FastifyInstance): Promise<void> {
   // ------------------------------------------------------------------ create
   app.post('/blog/posts', async (req, reply) => {
     const user = requireUser(req);
+    if (user.role < 1) {
+      throw ApiError.forbidden('普通用户只能投稿，请通过「投稿文章」提交审核');
+    }
     rateLimit(`blog:create:${user.id}`, 10, 60 * 60_000);
     const body = parse(
       z.object({
@@ -256,12 +260,12 @@ export async function blogRoutes(app: FastifyInstance): Promise<void> {
   // -------------------------------------------------------------------- edit
   app.patch('/blog/posts/:id', async (req, reply) => {
     const user = requireUser(req);
+    if (user.role < 1) {
+      throw ApiError.forbidden('普通用户只能投稿，请通过「投稿文章」提交审核');
+    }
     const id = parseId((req.params as { id: string }).id, '博客 ID');
     const row = get<{ author_id: number }>('SELECT author_id FROM blogs WHERE id = ?', id);
     if (!row) throw ApiError.notFound('博客不存在');
-    if (user.role !== 2 && row.author_id !== user.id) {
-      throw ApiError.forbidden('您没有权限编辑此博客文章');
-    }
     const body = parse(
       z.object({
         title: titleSchema,

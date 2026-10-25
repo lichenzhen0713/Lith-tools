@@ -22,6 +22,10 @@ function int(value: string | undefined, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+const lczojBaseUrl = (process.env.LCZOJ_BASE_URL ?? '').replace(/\/+$/, '');
+const lczojClientId = process.env.LCZOJ_CLIENT_ID ?? '';
+const lczojClientSecret = process.env.LCZOJ_CLIENT_SECRET ?? '';
+
 export const config = {
   env,
   isProd,
@@ -58,6 +62,16 @@ export const config = {
     baseUrl: (process.env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/v1').replace(/\/$/, ''),
     chatModel: process.env.DEEPSEEK_CHAT_MODEL ?? 'deepseek-chat',
     reasoningModel: process.env.DEEPSEEK_REASONING_MODEL ?? 'deepseek-reasoner',
+  },
+  /** OAuth2 客户端：使用 LCZOJ 账号授权登录（不配置时登录页不显示入口）。 */
+  lczoj: {
+    baseUrl: lczojBaseUrl,
+    clientId: lczojClientId,
+    clientSecret: lczojClientSecret,
+    /** 留空时按请求 Host 自动推导为 `<origin>/api/auth/lczoj/callback`。 */
+    redirectUri: process.env.LCZOJ_REDIRECT_URI ?? '',
+    name: process.env.LCZOJ_NAME ?? 'LCZOJ',
+    enabled: Boolean(lczojBaseUrl && lczojClientId && lczojClientSecret),
   },
   /** Demo data (blog posts, forum threads) created by `npm run db:seed`. */
   seedDemo: bool(process.env.SEED_DEMO, true),

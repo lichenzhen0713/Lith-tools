@@ -56,9 +56,10 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 
 ### 社区与账户
 
-- **博客**：Markdown 写作、实时预览、KaTeX 公式、代码块、分类、公开/私密、点赞、分页评论、投稿审核。
+- **博客**：普通用户投稿后人工审核，管理员可直接用 Markdown 写作 / 发布（实时预览、KaTeX 公式、代码块、分类、公开/私密）；支持点赞与分页评论。
 - **论坛**：板块、主题、回复、编辑/删除、管理员板块管理。
 - **账户**：邮箱验证码注册、登录、找回密码、资料/密码修改、会话管理、个人中心。
+- **LCZOJ 授权登录**：登录页可通过 OAuth 2.0 使用 LCZOJ 账号授权登录（首次自动创建本地账号，不共享密码与会话）。
 - **反馈与投稿**：评分反馈、工具推荐、审核流转、邮件通知（可选）。
 
 ### 管理后台
@@ -69,6 +70,7 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 
 - **邮件**：配置 SMTP 后发送验证码、重置链接与审核通知。
 - **AI 助手**：接入 DeepSeek，支持通用对话、深度思考（展示推理过程）、代码、翻译与写作五种模式；密钥只保存在服务端，可在管理后台填写，环境变量作为默认值。
+- **LCZOJ 登录**：通过 OAuth 2.0 授权码流程使用 LCZOJ 账号登录；密码不经过本站，可选启用。LCZOJ 侧配置见其 `docs/OAUTH.md`。
 
 ## 截图
 
@@ -172,6 +174,10 @@ docker compose up -d --build
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | 空 / `465` / `true` | 邮件服务 |
 | `DEEPSEEK_API_KEY` / `DEEPSEEK_BASE_URL` | 空 / `https://api.deepseek.com/v1` | AI 助手密钥与接口地址（仅服务端） |
 | `DEEPSEEK_CHAT_MODEL` / `DEEPSEEK_REASONING_MODEL` | `deepseek-chat` / `deepseek-reasoner` | 对话与深度思考模型 |
+| `LCZOJ_BASE_URL` | 空 | LCZOJ 站点地址（如 `https://oj.example.com`）；留空则关闭授权登录 |
+| `LCZOJ_CLIENT_ID` / `LCZOJ_CLIENT_SECRET` | 空 | 与 LCZOJ 的 `OJ_OAUTH_CLIENT_ID` / `OJ_OAUTH_CLIENT_SECRET` 保持一致 |
+| `LCZOJ_REDIRECT_URI` | 空 | 回调地址；留空时按请求 Host 推导为 `<origin>/api/auth/lczoj/callback` |
+| `LCZOJ_NAME` | `LCZOJ` | 登录按钮与授权提示里的站点名称 |
 | `SEED_DEMO` | `true` | 空库时写入欢迎博客/论坛内容 |
 
 ## 脚本

@@ -126,7 +126,9 @@ export default function BlogList() {
     patchParams({ page: totalPages <= 1 ? null : String(totalPages) });
   }, [posts.data, page, patchParams]);
 
-  const startWriting = () => navigate(user ? '/blog/new' : '/login?next=/blog/new');
+  const canPublish = Boolean(user && user.role >= 1);
+  const startWriting = () =>
+    navigate(!user ? '/login?next=/submit/blog' : canPublish ? '/blog/new' : '/submit/blog');
 
   const items = posts.data?.items ?? [];
   const total = posts.data?.total ?? 0;
@@ -144,9 +146,11 @@ export default function BlogList() {
             <Link to="/submit/blog" className="btn-secondary btn-sm">
               <Send className="size-3.5" /> 投稿文章
             </Link>
-            <Button size="sm" icon={PenLine} onClick={startWriting}>
-              写文章
-            </Button>
+            {canPublish ? (
+              <Button size="sm" icon={PenLine} onClick={startWriting}>
+                写文章
+              </Button>
+            ) : null}
           </>
         }
       />

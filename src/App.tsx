@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Layout } from './components/layout';
-import { RequireAdmin, RequireAuth } from './lib/auth';
+import { RequireAdmin, RequireAuth, RequirePublisher } from './lib/auth';
 
 const Home = lazy(() => import('./pages/Home'));
 const ToolsIndex = lazy(() => import('./pages/ToolsIndex'));
@@ -44,9 +44,9 @@ export default function App() {
         <Route path="tools/:slug" element={<ToolPage />} />
 
         <Route path="blog" element={<BlogList />} />
-        <Route path="blog/new" element={<RequireAuth><BlogEditor /></RequireAuth>} />
+        <Route path="blog/new" element={<RequirePublisher><BlogEditor /></RequirePublisher>} />
         <Route path="blog/:id" element={<BlogDetail />} />
-        <Route path="blog/:id/edit" element={<RequireAuth><BlogEditor /></RequireAuth>} />
+        <Route path="blog/:id/edit" element={<RequirePublisher><BlogEditor /></RequirePublisher>} />
         <Route path="submit/blog" element={<RequireAuth><SubmitBlog /></RequireAuth>} />
 
         <Route path="forum" element={<ForumList />} />

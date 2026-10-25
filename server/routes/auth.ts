@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyInstance, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { config } from '../config.js';
 import { addMinutes, count, get, nowIso, run, all } from '../db/client.js';
@@ -9,6 +9,7 @@ import {
   destroySession,
   getClientIp,
   publicUser,
+  requestOrigin,
   requireUser,
   setSessionCookie,
 } from '../lib/auth.js';
@@ -16,12 +17,6 @@ import { resetMail, sendMail, verificationMail } from '../lib/email.js';
 import { ApiError, hashPassword, randomCode, randomToken, rateLimit, sha256, verifyPassword } from '../lib/security.js';
 import { emailSchema, parse, passwordSchema, usernameSchema } from '../lib/validation.js';
 import type { AuthResponse, MessageResponse } from '../../shared/types.js';
-
-function requestOrigin(req: FastifyRequest): string {
-  if (config.publicOrigin) return config.publicOrigin.replace(/\/$/, '');
-  const host = req.headers.host ?? 'localhost';
-  return `http://${host}`;
-}
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.get('/me', async (req) => {

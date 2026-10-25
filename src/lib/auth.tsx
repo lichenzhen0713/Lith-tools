@@ -77,6 +77,25 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+/** 直接写文章 / 编辑文章仅限管理员；普通用户引导到「投稿文章」。 */
+export function RequirePublisher({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+      </div>
+    );
+  }
+  if (!user) {
+    const next = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/login?next=${next}`} replace />;
+  }
+  if (user.role < 1) return <Navigate to="/submit/blog" replace />;
+  return <>{children}</>;
+}
+
 export function RequireAdmin({ children, superOnly = false }: { children: ReactNode; superOnly?: boolean }) {
   const { user, loading } = useAuth();
   const location = useLocation();

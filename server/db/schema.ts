@@ -242,6 +242,24 @@ const migrations: Migration[] = [
       );
     `,
   },
+  {
+    version: 3,
+    name: 'oauth account links',
+    sql: /* sql */ `
+      -- 第三方 OAuth 账号与本地用户的绑定。provider_user_id 存 LCZOJ 的永久 sub
+      -- （不是可复用的 uid），一个本地用户可绑定多个第三方账号。
+      CREATE TABLE oauth_accounts (
+        provider            TEXT    NOT NULL,
+        provider_user_id    TEXT    NOT NULL,
+        user_id             INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        provider_username   TEXT    NOT NULL DEFAULT '',
+        provider_email      TEXT    NOT NULL DEFAULT '',
+        linked_at           TEXT    NOT NULL,
+        PRIMARY KEY (provider, provider_user_id)
+      );
+      CREATE INDEX idx_oauth_accounts_user ON oauth_accounts(user_id);
+    `,
+  },
 ];
 
 export function migrate(): void {

@@ -443,10 +443,10 @@ export default function BlogDetail() {
           <ArrowLeft className="size-4" /> 返回博客列表
         </Link>
         <Link
-          to={user ? '/blog/new' : loginHref('/blog/new')}
+          to={user && user.role >= 1 ? '/blog/new' : user ? '/submit/blog' : loginHref('/submit/blog')}
           className="text-indigo-600 hover:underline dark:text-indigo-400"
         >
-          写一篇文章
+          {user && user.role >= 1 ? '写一篇文章' : '投稿一篇文章'}
         </Link>
       </div>
 

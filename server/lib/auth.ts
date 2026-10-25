@@ -29,6 +29,16 @@ interface SessionRow {
   last_ip: string | null;
 }
 
+/** Public origin of this deployment, used for absolute links (mail + OAuth redirect_uri). */
+export function requestOrigin(req: FastifyRequest): string {
+  if (config.publicOrigin) return config.publicOrigin.replace(/\/$/, '');
+  const host = req.headers.host ?? 'localhost';
+  const forwarded = config.trustProxy ? req.headers['x-forwarded-proto'] : undefined;
+  const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  const proto = raw?.split(',')[0]?.trim().toLowerCase() === 'https' ? 'https' : 'http';
+  return `${proto}://${host}`;
+}
+
 export function getClientIp(req: FastifyRequest): string {
   if (config.trustProxy) {
     const forwarded = req.headers['x-forwarded-for'];

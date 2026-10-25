@@ -11,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { errorMessage, http } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import { useApi, useDocumentTitle } from '../lib/hooks';
 import { useToast } from '../lib/toast';
 import { cn, formatDate } from '../lib/utils';
@@ -57,6 +58,8 @@ function statusMeta(status: MySubmission['status'] | string) {
 export default function SubmitBlog() {
   useDocumentTitle('投稿文章');
   const toast = useToast();
+  const { user } = useAuth();
+  const canPublish = Boolean(user && user.role >= 1);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -119,9 +122,11 @@ export default function SubmitBlog() {
             <Link to="/blog" className="btn-secondary btn-sm">
               <ArrowLeft className="size-3.5" /> 返回博客
             </Link>
-            <Link to="/blog/new" className="btn-ghost btn-sm">
-              直接写文章
-            </Link>
+            {canPublish ? (
+              <Link to="/blog/new" className="btn-ghost btn-sm">
+                直接写文章
+              </Link>
+            ) : null}
           </>
         }
       />
@@ -318,11 +323,17 @@ export default function SubmitBlog() {
               </li>
             </ul>
             <p className="mt-4 border-t pt-3 text-xs leading-relaxed subtle">
-              想立即发布文章？拥有发文权限的账号可以直接
-              <Link to="/blog/new" className="mx-1 text-indigo-600 hover:underline dark:text-indigo-400">
-                写文章
-              </Link>
-              ，无需审核。
+              {canPublish ? (
+                <>
+                  想立即发布文章？拥有发文权限的账号可以直接
+                  <Link to="/blog/new" className="mx-1 text-indigo-600 hover:underline dark:text-indigo-400">
+                    写文章
+                  </Link>
+                  ，无需审核。
+                </>
+              ) : (
+                '普通用户提交的文章会进入审核队列，审核通过后由管理员发布到博客频道。'
+              )}
             </p>
           </Card>
         </aside>

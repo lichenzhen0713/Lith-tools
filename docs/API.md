@@ -75,6 +75,9 @@
 | GET | `/api/auth/sessions` | 登录 | 当前用户会话列表（含 `current` 标记） |
 | DELETE | `/api/auth/sessions/:id` | 登录 | 退出指定会话 |
 | DELETE | `/api/auth/account` | 登录 | `{ password }` → 注销账户（超级管理员不可注销） |
+| GET | `/api/auth/lczoj/status` | 公开 | `{ enabled, name }`：是否已配置 LCZOJ 授权登录 |
+| GET | `/api/auth/lczoj` | 公开 | 发起 LCZOJ OAuth 授权；`next` 为登录后回到的站内路径 |
+| GET | `/api/auth/lczoj/callback` | 公开 | OAuth 回调；由 LCZOJ 跳转，校验 state、换 token、建立本地会话 |
 
 密码规则：8–128 位，必须同时包含字母与数字。用户名 3–32 位，允许字母、数字、下划线、点、短横线与中文。
 
@@ -85,6 +88,35 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"username":"admin","password":"admin123456"}'
 ```
+
+### 使用 LCZOJ 账号登录（OAuth 2.0）
+
+登录页会请求 `GET /api/auth/lczoj/status`，仅当返回 `enabled: true` 时显示入口。完整流程：
+
+1. 浏览器打开 `GET /api/auth/lczoj?next=/dashboard`；
+2. 服务端生成随机 `state` 并写入 HttpOnly Cookie，302 到
+   `LCZOJ_BASE_URL/api/oauth/authorize?...`；
+3. 用户在 LCZOJ 登录并同意授权，回跳
+   `GET /api/auth/lczoj/callback?code=…&state=…`；
+4. 服务端校验 `state`，用 `code` + `client_secret` 换取 `access_token`，再读取
+   `GET LCZOJ_BASE_URL/api/oauth/userinfo`；
+5. 按 LCZOJ 的永久 `sub` 查找绑定：已绑定直接登录；首次登录自动创建本地账号
+   （用户名冲突时追加 `_1`、`_2`……；不继承 LCZOJ 的管理权限）；
+6. 建立 `lith_session` 会话并 302 回 `next`。
+
+失败时回跳 `/login?error=<code>`，`code` 为
+`lczoj_unconfigured`、`lczoj_denied`、`lczoj_state`、`lczoj_banned`、`lczoj_failed` 之一。
+
+所需环境变量（两端必须一致）：
+
+| Lith Tools | LCZOJ |
+| --- | --- |
+| `LCZOJ_BASE_URL` | — |
+| `LCZOJ_CLIENT_ID` | `OJ_OAUTH_CLIENT_ID` |
+| `LCZOJ_CLIENT_SECRET` | `OJ_OAUTH_CLIENT_SECRET` |
+| `LCZOJ_REDIRECT_URI` | `OJ_OAUTH_REDIRECT_URIS` |
+
+LCZOJ 侧的配置与端点说明见其仓库的 `docs/OAUTH.md`。
 
 ## 站点与工具
 
@@ -118,8 +150,8 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
 | GET | `/api/blog/recent?limit=3` | 公开 | 最新公开文章 |
 | GET | `/api/blog/categories` | 公开 | 分类与文章数 |
 | GET | `/api/blog/posts/:id` | 公开 / 作者 / 超级管理员 | 详情并递增阅读量；含评论第 1 页与点赞状态 |
-| POST | `/api/blog/posts` | 登录 | `{ title, content, categoryId?, isPublic? }` |
-| PATCH | `/api/blog/posts/:id` | 作者 / 超级管理员 | 同上字段；更新 `latest_at` |
+| POST | `/api/blog/posts` | 管理员 | `{ title, content, categoryId?, isPublic? }`；普通用户请走投稿接口 |
+| PATCH | `/api/blog/posts/:id` | 管理员 | 同上字段；更新 `latest_at` |
 | DELETE | `/api/blog/posts/:id` | 作者 / 管理员 | 级联删除评论与点赞 |
 | POST | `/api/blog/posts/:id/like` | 登录 | 切换点赞 → `{ liked, likes }` |
 | GET | `/api/blog/posts/:id/comments` | 公开/可见 | 评论分页（默认 5） |
@@ -132,6 +164,9 @@ curl -c cookies.txt -X POST http://localhost:8787/api/auth/login \
 | DELETE | `/api/blog/submissions/:id` | 作者 / 管理员 | 删除投稿 |
 
 私有文章（`isPublic=false`）仅作者、超级管理员可见；不可见时返回 404，避免泄露存在性。
+
+**发文权限**：只有管理员（`role >= 1`）可以调用 `POST/PATCH /api/blog/posts` 直接发布或编辑文章；普通用户只能通过
+`POST /api/blog/submissions` 提交投稿，审核通过后由管理员发布。列表 / 详情中的 `canEdit` 也仅对管理员返回 `true`。
 
 ## 论坛
 

@@ -91,39 +91,22 @@ if (me.data?.user?.username === username) pass('session cookie works');
 else fail('session cookie works', JSON.stringify(me.data).slice(0, 200));
 
 // --------------------------------------------------------------------- blog
-const post = await expectStatus('create blog post', request('/api/blog/posts', {
+// 普通用户只能投稿；直接发布/编辑文章应被拒绝。
+const directPost = await request('/api/blog/posts', {
   method: 'POST',
-  body: {
-    title: '冒烟测试文章',
-    content: '# 冒烟测试\n\n这是一篇由 `scripts/smoke.mjs` 创建的文章。\n\n$$E=mc^2$$',
-    isPublic: true,
-  },
+  body: { title: '普通用户直发', content: '不应成功', isPublic: true },
+  expect: [403],
+});
+if (directPost.status === 403) pass('normal user cannot publish directly');
+else fail('normal user cannot publish directly', `status ${directPost.status}`);
+
+await expectStatus('submit blog post', request('/api/blog/submissions', {
+  method: 'POST',
+  body: { title: '冒烟测试投稿', content: '这是一篇由 `scripts/smoke.mjs` 提交的投稿。' },
 }));
-const postId = post.data?.post?.id;
-if (postId) {
-  await expectStatus('read blog post', request(`/api/blog/posts/${postId}`));
-  const listed = await expectStatus('list blog posts', request('/api/blog/posts?pageSize=5'));
-  if (listed.data?.items?.some((item) => item.id === postId)) pass('post appears in list');
-  else fail('post appears in list', 'new post missing');
-
-  const liked = await expectStatus('like post', request(`/api/blog/posts/${postId}/like`, { method: 'POST', body: {} }));
-  if (liked.data?.liked === true && liked.data?.likes === 1) pass('like toggle');
-  else fail('like toggle', JSON.stringify(liked.data));
-
-  await expectStatus('comment on post', request(`/api/blog/posts/${postId}/comments`, {
-    method: 'POST',
-    body: { comment: '自动测试评论' },
-  }));
-  const comments = await expectStatus('list comments', request(`/api/blog/posts/${postId}/comments`));
-  if (comments.data?.total === 1) pass('comment persisted');
-  else fail('comment persisted', `total=${comments.data?.total}`);
-
-  await expectStatus('edit own post', request(`/api/blog/posts/${postId}`, {
-    method: 'PATCH',
-    body: { title: '冒烟测试文章（已编辑）', content: '编辑后的内容', isPublic: true },
-  }));
-  await expectStatus('delete own post', request(`/api/blog/posts/${postId}`, { method: 'DELETE' }));
-}
+const mySubmissions = await expectStatus('my blog submissions', request('/api/blog/submissions/mine'));
+if (mySubmissions.data?.items?.some((item) => item.title === '冒烟测试投稿')) pass('submission appears in mine');
+else fail('submission appears in mine', JSON.stringify(mySubmissions.data).slice(0, 200));
 
 // -------------------------------------------------------------------- forum
 const forums = await expectStatus('forum list', request('/api/forum/forums'));
@@ -172,6 +155,41 @@ const adminLogin = await request('/api/auth/login', {
 });
 if (adminLogin.status === 200) {
   pass('admin login');
+
+  const post = await expectStatus('admin create blog post', request('/api/blog/posts', {
+    method: 'POST',
+    body: {
+      title: '冒烟测试文章',
+      content: '# 冒烟测试\n\n这是一篇由 `scripts/smoke.mjs` 创建的文章。\n\n$$E=mc^2$$',
+      isPublic: true,
+    },
+  }));
+  const postId = post.data?.post?.id;
+  if (postId) {
+    await expectStatus('read blog post', request(`/api/blog/posts/${postId}`));
+    const listed = await expectStatus('list blog posts', request('/api/blog/posts?pageSize=5'));
+    if (listed.data?.items?.some((item) => item.id === postId)) pass('post appears in list');
+    else fail('post appears in list', 'new post missing');
+
+    const liked = await expectStatus('like post', request(`/api/blog/posts/${postId}/like`, { method: 'POST', body: {} }));
+    if (liked.data?.liked === true && liked.data?.likes === 1) pass('like toggle');
+    else fail('like toggle', JSON.stringify(liked.data));
+
+    await expectStatus('comment on post', request(`/api/blog/posts/${postId}/comments`, {
+      method: 'POST',
+      body: { comment: '自动测试评论' },
+    }));
+    const comments = await expectStatus('list comments', request(`/api/blog/posts/${postId}/comments`));
+    if (comments.data?.total === 1) pass('comment persisted');
+    else fail('comment persisted', `total=${comments.data?.total}`);
+
+    await expectStatus('edit blog post', request(`/api/blog/posts/${postId}`, {
+      method: 'PATCH',
+      body: { title: '冒烟测试文章（已编辑）', content: '编辑后的内容', isPublic: true },
+    }));
+    await expectStatus('delete blog post', request(`/api/blog/posts/${postId}`, { method: 'DELETE' }));
+  }
+
   await expectStatus('admin stats', request('/api/admin/stats'));
   await expectStatus('admin users', request('/api/admin/users'));
   await expectStatus('admin tools', request('/api/admin/tools'));

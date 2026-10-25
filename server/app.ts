@@ -12,6 +12,7 @@ import { adminRoutes } from './routes/admin.js';
 import { adminSettingsRoutes } from './routes/admin-settings.js';
 import { assistantRoutes } from './routes/assistant.js';
 import { authRoutes } from './routes/auth.js';
+import { lczojRoutes } from './routes/lczoj.js';
 import { blogRoutes } from './routes/blog.js';
 import { engagementRoutes } from './routes/engagement.js';
 import { forumRoutes } from './routes/forum.js';
@@ -105,6 +106,7 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   await app.register(publicRoutes, { prefix: '/api' });
   await app.register(authRoutes, { prefix: '/api/auth' });
+  await app.register(lczojRoutes, { prefix: '/api/auth' });
   await app.register(blogRoutes, { prefix: '/api' });
   await app.register(forumRoutes, { prefix: '/api' });
   await app.register(engagementRoutes, { prefix: '/api' });
