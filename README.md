@@ -120,7 +120,10 @@ Lith Tools 是一个自托管的在线工具箱。它最初是一个个人 PHP �
 ### 本地开发
 
 ```bash
-git clone <repository-url> lith-tools
+# GitHub
+git clone https://github.com/lichenzhen0713/Lith-tools.git lith-tools
+# 或 Gitee 镜像
+# git clone https://gitee.com/lichenzhen0713/Lith-tools.git lith-tools
 cd lith-tools
 
 npm install
