@@ -40,7 +40,7 @@ deploy\install.bat
 ## 构建与启动
 
 ```bash
-npm ci
+npm ci --include=dev       # 构建需要 vite / typescript 等 devDependencies
 cp .env.example .env       # 填写 PUBLIC_ORIGIN、SMTP 等
 npm run db:seed            # 首次部署：建库 + 工具目录 + 管理员
 npm run build              # dist/ + dist-server/
@@ -166,7 +166,7 @@ sudo systemctl start lith-tools
 
 ```bash
 git pull
-npm ci
+npm ci --include=dev
 npm run build
 sudo systemctl restart lith-tools
 ```
@@ -184,6 +184,7 @@ docker compose up -d --build
 - 数据卷：`./data:/app/data`
 - 端口：`8787:8787`
 - 通过环境变量覆盖配置；未设置 `PUBLIC_ORIGIN` 时默认为 `http://localhost:8787`
+- 本地 HTTP 测试默认 `COOKIE_SECURE=false`；正式 HTTPS 部署请设置 `COOKIE_SECURE=true`
 
 > 说明：该 Docker 配置为多阶段构建，尚未在本项目的 CI 中做容器构建验证。请在正式部署前自行构建并检查镜像、权限与数据卷。
 

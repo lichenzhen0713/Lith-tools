@@ -58,7 +58,7 @@ node dist-server\server\index.js
 
 ```bash
 cd /www/wwwroot/lith-tools
-npm ci
+npm ci --include=dev
 npm run build
 bash deploy/install.sh --no-service --skip-build --origin https://tools.example.com
 ```
@@ -124,7 +124,7 @@ chmod 600 /www/wwwroot/lith-tools/.env
 3. 在项目目录执行：
 
 ```bash
-npm ci
+npm ci --include=dev
 npm run build
 bash deploy/install.sh --no-service --skip-build --origin https://tools.example.com
 ```
@@ -132,7 +132,7 @@ bash deploy/install.sh --no-service --skip-build --origin https://tools.example.
 Windows 小皮可直接双击 `deploy\install.bat`，或手动：
 
 ```bat
-npm ci
+npm ci --include=dev
 npm run build
 node deploy\init-env.cjs
 ```
@@ -172,7 +172,7 @@ ADMIN_PASSWORD=随机生成的密码
 ```bash
 cd /www/wwwroot/lith-tools
 git pull
-npm ci
+npm ci --include=dev
 npm run build
 # 面板里重启 Node 项目 / PM2 restart lith-tools / systemctl restart lith-tools
 ```

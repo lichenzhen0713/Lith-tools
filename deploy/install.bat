@@ -49,11 +49,11 @@ echo [lith-tools] npm 版本：
 call npm -v
 
 if exist "package-lock.json" (
-  echo [lith-tools] 安装依赖：npm ci
-  call npm ci
+  echo [lith-tools] 安装依赖：npm ci --include=dev
+  call npm ci --include=dev
 ) else (
-  echo [lith-tools] 安装依赖：npm install
-  call npm install
+  echo [lith-tools] 安装依赖：npm install --include=dev
+  call npm install --include=dev
 )
 if errorlevel 1 goto :error
 

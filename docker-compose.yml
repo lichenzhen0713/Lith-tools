@@ -32,7 +32,8 @@ services:
       LCZOJ_CLIENT_SECRET: ${LCZOJ_CLIENT_SECRET:-}
       LCZOJ_REDIRECT_URI: ${LCZOJ_REDIRECT_URI:-}
       LCZOJ_NAME: ${LCZOJ_NAME:-LCZOJ}
-      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      # 本地 HTTP 测试默认 false；正式 HTTPS 部署请设为 true
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
       SEED_DEMO: ${SEED_DEMO:-true}
     volumes:
       - ./data:/app/data

@@ -131,11 +131,11 @@ cd "$APP_DIR"
 
 if [ "$SKIP_BUILD" -eq 0 ]; then
   if [ -f package-lock.json ]; then
-    info "安装依赖：npm ci"
-    "$NPM_BIN" ci
+    info "安装依赖：npm ci --include=dev"
+    "$NPM_BIN" ci --include=dev
   else
-    info "安装依赖：npm install"
-    "$NPM_BIN" install
+    info "安装依赖：npm install --include=dev"
+    "$NPM_BIN" install --include=dev
   fi
   info "构建生产版本：npm run build"
   "$NPM_BIN" run build
