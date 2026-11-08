@@ -16,13 +16,13 @@ export function AuthShell({
   return (
     <div className="mx-auto flex max-w-5xl items-center px-4 py-12 sm:px-6 sm:py-16">
       <div className="grid w-full overflow-hidden rounded-3xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-[var(--shadow-lg)] lg:grid-cols-2">
-        <div className="relative hidden flex-col justify-between overflow-hidden bg-[linear-gradient(135deg,#4f46e5_0%,#5b5bf0_48%,#06b6d4_100%)] p-10 text-white lg:flex">
+        <div className="relative hidden flex-col justify-between overflow-hidden bg-[linear-gradient(135deg,#0a8dff_0%,#3f7cf7_48%,#6a5af9_100%)] p-10 text-white lg:flex">
           <div className="absolute -top-24 -right-24 size-64 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
-          <div className="absolute -bottom-20 -left-16 size-56 rounded-full bg-cyan-300/20 blur-2xl" aria-hidden="true" />
+          <div className="absolute -bottom-20 -left-16 size-56 rounded-full bg-violet-300/20 blur-2xl" aria-hidden="true" />
           <div>
             <Link to="/" className="flex items-center gap-2.5">
               <span className="grid size-10 place-items-center rounded-xl bg-white p-1.5 shadow-sm">
-                <img src="/logo.svg?v=3" alt="" className="h-full w-auto" />
+                <img src="/logo.svg?v=4" alt="" className="h-full w-auto" />
               </span>
               <span className="text-[15px] font-bold tracking-tight">Lith Tools</span>
             </Link>

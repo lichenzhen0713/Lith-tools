@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { useDocumentTitle } from '../lib/hooks';
 import { useCatalog } from '../lib/tools';
 import { EmptyState, Skeleton } from '../components/ui';
 import { ToolCard } from '../components/ToolCard';
@@ -8,6 +9,7 @@ import { toolIcon } from '../icons';
 import { cn } from '../lib/utils';
 
 export default function ToolsIndex() {
+  useDocumentTitle('工具库');
   const [params, setParams] = useSearchParams();
   const { tools, categories, loading, error } = useCatalog();
   const query = params.get('q') ?? '';

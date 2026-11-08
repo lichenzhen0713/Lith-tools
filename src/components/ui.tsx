@@ -444,7 +444,7 @@ export function Pagination({
 /* ------------------------------------------------------------------ Avatar */
 export function Avatar({ name, size = 'md', className }: { name: string; size?: 'sm' | 'md' | 'lg'; className?: string }) {
   const initials = name.trim().slice(0, 1).toUpperCase() || '?';
-  const palette = ['from-indigo-500 to-violet-500', 'from-sky-500 to-cyan-500', 'from-emerald-500 to-teal-500', 'from-amber-500 to-orange-500', 'from-rose-500 to-pink-500'];
+  const palette = ['from-indigo-500 to-violet-500', 'from-sky-500 to-violet-500', 'from-emerald-500 to-teal-500', 'from-amber-500 to-orange-500', 'from-rose-500 to-pink-500'];
   const hash = Array.from(name).reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const sizes = { sm: 'size-7 text-xs', md: 'size-9 text-sm', lg: 'size-12 text-lg' } as const;
   return (

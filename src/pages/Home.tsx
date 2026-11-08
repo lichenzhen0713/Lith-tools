@@ -13,7 +13,7 @@ import { toolCatalog } from '@shared/catalog';
 import type { BlogListItem, PublicStats, ThreadListItem } from '@shared/types';
 import { useCatalog } from '../lib/tools';
 import { http } from '../lib/api';
-import { useApi } from '../lib/hooks';
+import { useApi, useDocumentTitle } from '../lib/hooks';
 import { formatNumber, relativeTime } from '../lib/utils';
 import { Badge, Card, Skeleton } from '../components/ui';
 import { ToolCard } from '../components/ToolCard';
@@ -24,6 +24,7 @@ const featuredSlugs = toolCatalog.filter((tool) => tool.featured).map((tool) => 
 const popularSlugs = ['json-formatter', 'image-compress', 'qr-code', 'world-clock', 'gpa-calculator'];
 
 export default function Home() {
+  useDocumentTitle('首页');
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const { tools, categories, loading } = useCatalog();
@@ -79,7 +80,7 @@ export default function Home() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 pt-8 pb-10 sm:px-6 lg:grid-cols-[1.04fr_0.96fr] lg:gap-10 lg:pt-10 lg:pb-14">
           <div className="text-center lg:text-left">
             <span className="inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-1 text-[11.5px] text-[var(--text-secondary)] shadow-[var(--shadow-soft)]">
-              <span className="size-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-[0_0_0_4px_rgba(99,102,241,0.14)]" />
+              <span className="size-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-400 shadow-[0_0_0_4px_rgba(99,102,241,0.14)]" />
               v2.0
               <span className="text-[var(--border-strong)]">·</span>
               70 个工具
@@ -137,7 +138,7 @@ export default function Home() {
 
           <div className="relative mx-auto w-full max-w-[400px] lg:max-w-none">
             <div
-              className="pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-gradient-to-br from-indigo-500/20 via-violet-500/10 to-cyan-400/20 blur-2xl"
+              className="pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-gradient-to-br from-indigo-500/20 via-violet-500/10 to-violet-400/20 blur-2xl"
               aria-hidden="true"
             />
             <QuickLab />

@@ -239,7 +239,7 @@ export default function Assistant() {
               className={cn(
                 'rounded-xl border p-3 text-left transition-all duration-150',
                 active
-                  ? 'border-transparent bg-[linear-gradient(135deg,#4f46e5,#06b6d4)] text-white shadow-[0_14px_30px_-18px_rgba(79,70,229,0.7)]'
+                  ? 'border-transparent bg-[linear-gradient(135deg,#0a8dff,#6a5af9)] text-white shadow-[0_14px_30px_-18px_rgba(10,141,255,0.7)]'
                   : 'border-[var(--card-border)] bg-[var(--card-bg)] hover:border-[var(--border-strong)] hover:bg-[var(--hover-bg)]',
               )}
               aria-pressed={active}
@@ -273,7 +273,7 @@ export default function Assistant() {
         <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <div className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-500/25">
+              <div className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25">
                 <Bot className="size-7" />
               </div>
               <p className="mt-4 max-w-md text-sm leading-relaxed muted">{MODE_GREETING[modeId] ?? MODE_GREETING.chat}</p>
@@ -310,7 +310,7 @@ export default function Assistant() {
                   <span
                     className={cn(
                       'grid size-8 shrink-0 place-items-center rounded-lg text-white',
-                      message.role === 'user' ? 'bg-slate-500 dark:bg-slate-600' : 'bg-gradient-to-br from-indigo-500 to-cyan-500',
+                      message.role === 'user' ? 'bg-slate-500 dark:bg-slate-600' : 'bg-gradient-to-br from-indigo-500 to-violet-500',
                     )}
                   >
                     {message.role === 'user' ? <UserIcon className="size-4" /> : <Bot className="size-4" />}
