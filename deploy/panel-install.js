@@ -224,6 +224,13 @@ function startService() {
   const logFd = fs.openSync(LOG_FILE, 'a');
   const panel = loadPanelEnv();
   const userIds = serviceUserIds();
+  if (userIds) {
+    try {
+      fs.fchownSync(logFd, userIds.uid, userIds.gid);
+    } catch {
+      /* ignore */
+    }
+  }
   const child = spawn(process.execPath, [path.join('dist-server', 'server', 'index.js')], {
     cwd: ROOT,
     detached: true,
@@ -430,6 +437,11 @@ DB_PATH=${DB_PATH}
 
   if (has('--start')) {
     out('');
+    try {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    } catch {
+      /* 权限问题交给下面启动失败的日志 */
+    }
     fixOwnership();
     if (!fs.existsSync(path.join(ROOT, 'dist-server', 'server', 'index.js'))) {
       warnLine('尚未构建（dist-server 不存在），请先运行：node deploy/panel-install.js');
