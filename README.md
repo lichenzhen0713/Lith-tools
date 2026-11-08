@@ -158,19 +158,26 @@ NODE_ENV=production node dist-server/server/index.js
 Linux（含宝塔 / 小皮 Linux 版）：
 
 ```bash
+# 裸机 systemd
 sudo bash deploy/install.sh --origin https://tools.example.com
-# 面板只构建、不安装 systemd：
-bash deploy/install.sh --no-service
+
+# 宝塔 / 小皮面板（方式与 LCZOJ 一致）
+node deploy/panel-install.js
+node deploy/panel-install.js --check   # 只检查
+node deploy/panel-install.js --stop    # 停止
 ```
 
 Windows（含小皮 Windows 版）：
 
 ```bat
 deploy\install.bat
+:: 面板部署（与 LCZOJ 一致）
+node deploy\panel-install.js
 ```
 
-脚本会安装依赖、构建、生成带随机管理员密码的 `.env`。宝塔 / 小皮的 Node 项目、PM2、反向代理、HTTPS
-与排错步骤见 **[docs/PANEL.md](docs/PANEL.md)**；通用部署说明见 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)。
+`panel-install.js` 会装依赖、构建、写 `deploy/panel.env`、后台启动并生成反向代理配置；`install.sh` 面向裸机
+systemd。宝塔 / 小皮的 Node 项目、PM2、反向代理、HTTPS 与排错步骤见
+**[docs/PANEL.md](docs/PANEL.md)**；通用部署说明见 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)。
 
 ### Docker
 
@@ -219,8 +226,12 @@ docker compose up -d --build
 | `npm run verify:extras` | 校验 AI 五种模式、KaTeX 渲染与字体加载 |
 | `npm run snapshot` | 生成完整页面截图（视觉回归用） |
 | `npm run docs:map` | 重新生成 `docs/URL-MAP.md` |
-| `bash deploy/install.sh` | Linux 一键部署（安装 Node、构建、生成 `.env`、systemd） |
+| `bash deploy/install.sh` | Linux 裸机一键部署（安装 Node、构建、生成 `.env`、systemd） |
 | `deploy\install.bat` | Windows 一键部署（构建、生成 `.env`、启动） |
+| `node deploy/panel-install.js` | 宝塔 / 小皮面板一键准备 + 后台启动（与 LCZOJ 一致） |
+| `deploy\panel-install.bat` | Windows 双击运行面板一键准备 |
+| `node deploy/panel-install.js --check` / `--stop` | 面板环境检查 / 停止后台服务 |
+| `node deploy/check-env.js` | 环境自检（Node、配置、数据目录、构建、端口） |
 | `pm2 start deploy/ecosystem.config.cjs` | 用 PM2 守护运行 |
 
 ## 测试与质量

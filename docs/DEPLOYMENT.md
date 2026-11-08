@@ -22,16 +22,20 @@ sudo bash deploy/install.sh --origin https://tools.example.com
 脚本会自动检查/安装 Node 24、安装依赖、构建、生成 `.env`（随机管理员密码），
 并在 systemd 可用时创建并启动 `lith-tools` 服务。
 
-面板部署（由面板管理进程，不安装 systemd）：
+面板部署（与 LCZOJ 的面板方式一致，由面板管理进程，不安装 systemd）：
 
 ```bash
-bash deploy/install.sh --no-service
+node deploy/panel-install.js          # 装依赖 + 构建 + 写 panel.env + 后台启动 + 生成反代配置
+node deploy/panel-install.js --check  # 只检查环境
+node deploy/panel-install.js --stop   # 停止后台服务
 ```
 
 ### Windows（含小皮 Windows 版）
 
 ```bat
 deploy\install.bat
+:: 面板部署（与 LCZOJ 一致）
+node deploy\panel-install.js
 ```
 
 安装依赖、构建、生成 `.env` 并前台启动。宝塔 / 小皮的详细操作、反向代理、HTTPS、PM2 与排错见

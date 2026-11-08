@@ -22,6 +22,12 @@ coverage/
 .env.*
 !.env.example
 
+# panel deployment runtime
+/deploy/panel.env
+/deploy/panel.pid
+/deploy/panel-nginx.conf
+/logs/
+
 # logs / editor
 *.log
 npm-debug.log*
