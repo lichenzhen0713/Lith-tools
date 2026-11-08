@@ -9,9 +9,17 @@ rem
 rem  参数可用 deploy\panel.env 同名的环境变量覆盖，
 rem  也可以在运行前用 set 命令临时指定（见下方默认值）。
 rem ============================================================================
-setlocal
+setlocal EnableExtensions
 
 cd /d "%~dp0.."
+
+rem 读取 deploy\panel.env（存在才读）：KEY=VALUE，以 # 开头的行视为注释
+if exist "deploy\panel.env" (
+  for /f "usebackq eol=# tokens=1,* delims==" %%A in ("deploy\panel.env") do (
+    if not "%%A"=="" set "%%A=%%B"
+  )
+  echo [lith-tools] 已加载 deploy\panel.env
+)
 
 if "%PORT%"=="" set PORT=8787
 if "%HOST%"=="" set HOST=127.0.0.1
