@@ -27,6 +27,7 @@ coverage/
 /deploy/panel.pid
 /deploy/panel-nginx.conf
 /logs/
+/backups/
 
 # logs / editor
 *.log

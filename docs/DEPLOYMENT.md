@@ -109,7 +109,9 @@ sudo journalctl -u lith-tools -f
 
 ## Nginx 反向代理
 
-仓库提供 [`deploy/nginx-lith-tools.conf`](../deploy/nginx-lith-tools.conf) 模板，宝塔 / 小皮可直接在面板里把反向代理指向 `http://127.0.0.1:8787`。
+仓库提供 [`deploy/nginx-lith-tools.conf`](../deploy/nginx-lith-tools.conf)（HTTP）与
+[`deploy/nginx-lith-tools-ssl.conf`](../deploy/nginx-lith-tools-ssl.conf)（HTTPS）模板，宝塔 / 小皮可直接在面板里把反向代理指向 `http://127.0.0.1:8787`。
+HTTPS 模板使用 `listen 443 ssl;` + `http2 on;`，并在 TLS 1.3 握手异常时回退到 `TLSv1.2`。
 
 ```nginx
 server {
@@ -167,6 +169,14 @@ sudo systemctl start lith-tools
 建议将备份纳入定时任务，并定期做一次恢复演练。
 
 ## 升级
+
+```bash
+bash deploy/update.sh
+```
+
+脚本会备份、拉取代码、构建、同步 LCZOJ 授权配置，并重启服务、验证静态资源与 OAuth 跳转。
+
+手动流程：
 
 ```bash
 git pull

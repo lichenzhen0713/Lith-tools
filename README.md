@@ -231,6 +231,7 @@ docker compose up -d --build
 | `node deploy/panel-install.js` | 宝塔 / 小皮面板一键准备 + 后台启动（与 LCZOJ 一致） |
 | `deploy\panel-install.bat` | Windows 双击运行面板一键准备 |
 | `node deploy/panel-install.js --check` / `--stop` | 面板环境检查 / 停止后台服务 |
+| `bash deploy/update.sh` | 一键更新：备份、构建、重启、同步 LCZOJ 授权并验证 |
 | `node deploy/check-env.js` | 环境自检（Node、配置、数据目录、构建、端口） |
 | `pm2 start deploy/ecosystem.config.cjs` | 用 PM2 守护运行 |
 

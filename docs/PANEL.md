@@ -78,10 +78,19 @@ node deploy/panel-install.js --no-build  # 已构建过，跳过装依赖/构建
 
 站点 →「SSL」→「Let's Encrypt」→ 勾选域名 → 申请 → 开启「强制 HTTPS」。
 
+注意事项（与 3.6 相同）：
+
+- Nginx 1.31 使用 `listen 443 ssl;` + `http2 on;`，不要写 `listen ... http2;`；
+- 证书私钥文件名按面板实际文件填写（可能是 `privkey.key`，不是 `privkey.pem`）；
+- 如果 Chrome 报 `ERR_SSL_PROTOCOL_ERROR`、`openssl s_client -tls1_3` 报 `handshake failure`，把
+  `ssl_protocols` 设为 `TLSv1.2`，详见 [3.6.4](#364-tls-13-握手异常)；
+- 不要在站点里配置 `root` / `location ~* \.(js|css)$` 等静态规则，否则 `/assets` 会 404 导致白屏。
+
 然后把 `deploy/panel.env` 改为：
 
 ```ini
 PUBLIC_ORIGIN=https://tools.example.com
+TRUST_PROXY=true
 COOKIE_SECURE=true
 ```
 
@@ -198,10 +207,181 @@ netsh advfirewall firewall add rule name="LithTools-443" dir=in action=allow pro
 
 云服务器还要在**安全组**里放行 80/443。
 
-### 3.6 申请 SSL
+### 3.6 配置 HTTPS
 
-站点 →「SSL / 证书」→ 申请 **Let's Encrypt** 免费证书 → 开启**强制 HTTPS**，然后把
-`deploy/panel.env` 的 `PUBLIC_ORIGIN` 改为 `https://你的域名`、`COOKIE_SECURE` 改为 `true`，重启服务。
+#### 3.6.1 申请/确认证书
+
+小皮 →「网站」→ 你的站点 →「SSL / 证书」→ 申请 **Let's Encrypt**，或上传已有证书。
+
+确认实际文件名：
+
+```bash
+ls -l /xp/panel/vhost/ssl/tools.example.com/cert/
+```
+
+不同面板版本的文件名不同，常见：
+
+```text
+fullchain.pem
+privkey.key      ← 注意不一定是 privkey.pem
+```
+
+配置里必须使用**实际存在的文件名**，否则 Nginx 会报：
+
+```text
+cannot load certificate key ... privkey.pem: No such file or directory
+```
+
+#### 3.6.2 完整 Nginx 配置
+
+先备份原站点配置，再把内容替换为下面这份（域名、路径按实际修改）：
+
+```nginx
+server {
+    listen 80;
+    server_name tools.example.com;
+
+    # Let's Encrypt 续期；若证书由小皮自动续期可保留
+    location ^~ /.well-known/acme-challenge/ {
+        root /xp/www/tools.example.com;
+        default_type text/plain;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name tools.example.com;
+
+    # 证书路径按实际填写；私钥可能是 privkey.key
+    ssl_certificate     /xp/panel/vhost/ssl/tools.example.com/cert/fullchain.pem;
+    ssl_certificate_key /xp/panel/vhost/ssl/tools.example.com/cert/privkey.key;
+
+    # 若 TLS 1.3 握手异常（Chrome 报 ERR_SSL_PROTOCOL_ERROR），只启用 TLS 1.2
+    ssl_protocols TLSv1.2;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    client_max_body_size 2m;
+
+    # 禁止访问 .env / .git 等隐藏文件
+    location ~ /\. {
+        deny all;
+    }
+
+    # 所有页面、/assets、SPA 路由全部反代给 Node
+    location / {
+        proxy_pass http://127.0.0.1:8787;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header Connection "";
+
+        proxy_connect_timeout 30s;
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+        proxy_buffering off;
+        proxy_redirect off;
+    }
+
+    location = /api/health {
+        proxy_pass http://127.0.0.1:8787/api/health;
+        access_log off;
+    }
+}
+```
+
+要点：
+
+- Nginx 1.31 必须写 `listen 443 ssl;` + `http2 on;`，不能写 `listen ... http2;`；
+- **不要**再配置 `root` / `index` / `location ~* \.(js|css)$` 等静态规则，否则 `/assets` 会被 Nginx 截走导致白屏；
+- 如果小皮自动生成了 `ssl.conf` 并且里面有 `ssl_protocols TLSv1.2 TLSv1.3;`，要么删掉站点里的 `include .../ssl.conf;`，要么把 `ssl.conf` 里的协议改成只有 `TLSv1.2`。
+
+#### 3.6.3 检查并重载
+
+先找到面板 Nginx 的完整路径（`nginx` 可能不在 PATH）：
+
+```bash
+find /xp -maxdepth 6 -type f -name nginx -perm -u+x 2>/dev/null
+```
+
+假设为 `/xp/server/nginx/sbin/nginx`：
+
+```bash
+/xp/server/nginx/sbin/nginx -t
+/xp/server/nginx/sbin/nginx -s reload
+```
+
+确认 TLS 版本真正生效：
+
+```bash
+/xp/server/nginx/sbin/nginx -T 2>/dev/null | grep -n "ssl_protocols"
+```
+
+应只看到 `ssl_protocols TLSv1.2;`。如果还有 `TLSv1.3`，说明被其他 `include` 覆盖：
+
+```bash
+grep -RIn "ssl_protocols" /xp/panel/vhost /xp/server/nginx/conf
+```
+
+#### 3.6.4 TLS 1.3 握手异常
+
+如果出现：
+
+- Chrome：`ERR_SSL_PROTOCOL_ERROR`
+- `openssl s_client -tls1_3` 报 `handshake failure (alert 40)`
+- 但 `openssl s_client -tls1_2` 正常
+
+说明服务器 TLS 1.3 配置有问题。上面的配置已经用 `ssl_protocols TLSv1.2;` 规避；对普通站点 TLS 1.2 足够安全。
+
+确认 TLS 1.2 正常：
+
+```bash
+printf '' | openssl s_client -connect 127.0.0.1:443 -servername tools.example.com -tls1_2 2>&1 | grep -E "Protocol|Cipher"
+```
+
+#### 3.6.5 应用配置并验证
+
+```bash
+cd /xp/www/tools.example.com
+nano deploy/panel.env
+```
+
+确认：
+
+```ini
+PUBLIC_ORIGIN=https://tools.example.com
+TRUST_PROXY=true
+COOKIE_SECURE=true
+```
+
+重启：
+
+```bash
+node deploy/panel-install.js --stop
+node deploy/panel-install.js --start
+```
+
+验证：
+
+```bash
+curl -I https://tools.example.com/
+curl https://tools.example.com/api/health
+curl -s https://tools.example.com/ | grep -o '/assets/[^"]*\.js' | head
+curl -I https://tools.example.com/assets/上面的文件名.js
+```
+
+`/assets/*.js` 必须是 `200`，不能是 Nginx 的 404。
 
 ### 3.7 开机自启（可选，二选一）
 
@@ -264,7 +444,12 @@ SMTP、DeepSeek、LCZOJ 授权登录等配置放在项目根目录 `.env`。修�
 | 直接访问 `IP:8787` 无响应、域名可访问 | 正常：`HOST=127.0.0.1` 表示仅本机，由 Nginx 反代 |
 | 登录后刷新掉线 | 未配置 HTTPS 却 `COOKIE_SECURE=true`；本地测试先设 `false`，生产请上 HTTPS |
 | 写操作 403「请求来源校验失败」 | 反向代理未透传 `Host`，或 `PUBLIC_ORIGIN` 与访问域名不一致 |
-| 页面空白 / 404 | 未执行构建，或启动目录不是项目根目录；重新运行 `node deploy/panel-install.js` |
+| 页面空白，`/assets/*.js` 返回 404 | 站点里仍有 `root` / `location ~* \.(js|css)$` 静态规则，把 `/assets` 截走了；只保留 `location /` 反代 |
+| Chrome 报 `ERR_SSL_PROTOCOL_ERROR` | 服务器 TLS 1.3 握手异常；把 `ssl_protocols` 设为 `TLSv1.2`，见 3.6.4 |
+| `nginx: [emerg] invalid parameter "http2"` 或 http2 弃用警告 | 改成 `listen 443 ssl;` + `http2 on;` |
+| `cannot load certificate key ... privkey.pem` | 私钥文件名不是 `privkey.pem`；`ls` 证书目录，常见为 `privkey.key` |
+| `nginx: command not found` | 不要 `apt install nginx`；用面板自带 Nginx 完整路径，如 `/xp/server/nginx/sbin/nginx` |
+| 改了 `ssl_protocols` 但 `nginx -T` 仍有 TLSv1.3 | `ssl.conf` 或其他 `include` 覆盖了；修改 `ssl.conf` 或删除该 include |
 | 上传文件报 413 | 站点配置缺少或过小的 `client_max_body_size`；模板为 2m |
 | 数据库无法写入 | `data/` 属主不是运行用户：`chown -R www:www data`（Windows 在面板权限中授权） |
 | 构建失败 | Node 版本不够，或 `NODE_ENV=production` 导致缺 devDependencies；使用 `npm ci --include=dev` |
@@ -277,6 +462,15 @@ SMTP、DeepSeek、LCZOJ 授权登录等配置放在项目根目录 `.env`。修�
 - **备份**：将 `data/` 目录完整下载（包含 `lith-tools.db`、`-wal`、`-shm`）。建议在面板中创建定时打包任务；
 - **迁移**：在新服务器按本文完成部署后，用备份的 `data/` 目录覆盖即可；
 - **升级**：
+
+```bash
+bash deploy/update.sh
+```
+
+脚本会备份 `data/`、`.env`、`deploy/panel.env`，拉取代码，同步 LCZOJ 授权配置，安装依赖并构建，
+然后重启实际占用 8787 的进程并验证新 JS/CSS 与 OAuth 跳转。
+
+手动流程：
 
 ```bash
 git pull

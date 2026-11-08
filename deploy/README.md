@@ -11,6 +11,7 @@
 | `panel-start.sh` / `panel-start.bat` | 宝塔 / 小皮 / PM2 的启动命令（工作目录 = 项目根目录，自动读取 `panel.env`） |
 | `check-env.js` | 环境自检：Node、配置文件、数据目录、构建产物、端口健康 |
 | `fix-lczoj-oauth.sh` | 一键修正 Lith Tools ↔ LCZOJ OAuth 配置并重启验证 |
+| `update.sh` | 一键更新：备份、拉代码、同步授权、构建、重启并验证 |
 | `ecosystem.config.cjs` | PM2 配置（自动读取 `deploy/panel.env`） |
 | `lith-tools.service` | systemd 模板（install.sh 会生成真实路径版本） |
 | `nginx-lith-tools.conf` | Nginx HTTP 反向代理模板（反向代理到 `127.0.0.1:8787`） |
